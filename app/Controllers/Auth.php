@@ -114,12 +114,12 @@ class Auth extends BaseController
 
         $file = $this->request->getFile('photo');
 
-        if ($file && $file->isValid()) {
+        if ($file) {
             $fileSize = $file->getSize();  // Get the file size
             log_message('debug', 'File uploaded, size: ' . $fileSize);
 
             // Check if file size exceeds 2MB (2,048,000 bytes)
-            if ($fileSize > 2048 * 1024) {
+            if ($fileSize == 0) {
                 log_message('debug', 'File size exceeds 2MB, returning error.');
                 return redirect()->back()->with('error', 'File size exceeds the maximum limit of 2MB.');
             }

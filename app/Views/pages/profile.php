@@ -93,10 +93,10 @@
         </button>
 
         <div class="profile-title">User Profile</div>
-        
+
         <?php if (session()->has('error')): ?>
             <div class="alert alert-danger text-center">
-                <?= esc(session()->getFlashdata('message')) ?>
+                <?= esc(session()->getFlashdata('error')) ?>
             </div>
         <?php endif; ?>
         
