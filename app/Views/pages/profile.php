@@ -93,7 +93,13 @@
         </button>
 
         <div class="profile-title">User Profile</div>
-
+        
+        <?php if (session()->has('error')): ?>
+            <div class="alert alert-danger text-center">
+                <?= esc(session()->getFlashdata('message')) ?>
+            </div>
+        <?php endif; ?>
+        
         <?php if (session()->has('message')): ?>
             <div class="alert alert-success text-center">
                 <?= esc(session()->getFlashdata('message')) ?>
@@ -101,7 +107,7 @@
         <?php endif; ?>
 
         <div class="profile-photo mb-3">
-            <img src="<?= $user->photo ? base_url($user->photo) : base_url('images/logo.png') ?>" alt="Profile Photo">
+            <img src="<?= $user->photo ? base_url($user->photo) : base_url('images/user.png') ?>" alt="Profile Photo">
         </div>
 
         <form action="<?= base_url('profile/update') ?>" method="post" enctype="multipart/form-data">

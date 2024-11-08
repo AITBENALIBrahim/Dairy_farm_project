@@ -93,80 +93,105 @@ class Auth extends BaseController
     }
 
     public function updateProfile()
-{
-    // Ensure the user is logged in
-    if (!session()->has('email')) {
-        return redirect()->to('auth/login');
-    }
-
-    // Get the user email from session
-    $email = session()->get('email');
-
-    // Load the user model
-    $userModel = new \App\Models\UserModel();
-    $user = $userModel->asObject()
-        ->where('email', $email)
-        ->first();
-
-    if (!$user) {
-        return redirect()->back()->with('error', 'User not found.');
-    }
-
-    // Set validation rules
-    $validationRules = [
-        'username' => 'required|min_length[3]|is_unique[users.username,id,' . $user->id . ']',
-        'email' => 'required|valid_email|is_unique[users.email,id,' . $user->id . ']',
-        'birth' => 'required|valid_date',
-        'gender' => 'in_list[male,female,other]',
-        'photo' => [
-            'uploaded[photo]',
-            'mime_in[photo,image/jpg,image/jpeg,image/png]',
-            'max_size[photo,2048]',
-        ],
-    ];
-
-    // Validate the input
-    if (!$this->validate($validationRules)) {
-        // Remove file from the input data before passing to the session
-        $inputData = $this->request->getPost();
-        unset($inputData['photo']); // Ensure the file field is not passed back into session
-
-        return redirect()->back()->with('validation', $this->validator)->with('inputData', $inputData);
-    }
-
-    // Prepare data for updating the user profile
-    $data = [
-        'username' => $this->request->getPost('username'),
-        'email' => $this->request->getPost('email'),
-        'birth' => $this->request->getPost('birth'),
-        'gender' => $this->request->getPost('gender'),
-    ];
-
-    // Handle photo upload if a new file is provided
-    $file = $this->request->getFile('photo');
-    if ($file && $file->isValid() && !$file->hasMoved()) {
-        $newFileName = $file->getRandomName();
-        // Move file to public/uploads/profile_photos/
-        $file->move(WRITEPATH . '../public/uploads/profile_photos/', $newFileName);  // NOTE: Adjusted the path to move to the public folder
-        $data['photo'] = 'uploads/profile_photos/' . $newFileName;
-
-        // Optionally delete the old profile photo if it exists
-        if (!empty($user->photo) && file_exists(WRITEPATH . '../public/' . $user->photo)) {
-            unlink(WRITEPATH . '../public/' . $user->photo);
+    {
+        // Ensure the user is logged in
+        if (!session()->has('email')) {
+            return redirect()->to('auth/login');
         }
+
+        // Get the user email from session
+        $email = session()->get('email');
+
+        // Load the user model
+        $userModel = new \App\Models\UserModel();
+        $user = $userModel->asObject()
+            ->where('email', $email)
+            ->first();
+
+        if (!$user) {
+            return redirect()->back()->with('error', 'User not found.');
+        }
+
+        $file = $this->request->getFile('photo');
+
+        if ($file && $file->isValid()) {
+            $fileSize = $file->getSize();  // Get the file size
+            log_message('debug', 'File uploaded, size: ' . $fileSize);
+
+            // Check if file size exceeds 2MB (2,048,000 bytes)
+            if ($fileSize > 2048 * 1024) {
+                log_message('debug', 'File size exceeds 2MB, returning error.');
+                return redirect()->back()->with('error', 'File size exceeds the maximum limit of 2MB.');
+            }
+        }
+
+
+        // Set validation rules
+        $validationRules = [
+            'username' => 'required|min_length[3]|is_unique[users.username,id,' . $user->id . ']',
+            'email' => 'required|valid_email|is_unique[users.email,id,' . $user->id . ']',
+            'birth' => 'required|valid_date',
+            'gender' => 'in_list[male,female,other]',
+        ];
+
+        // Add photo validation rules if a photo is uploaded and valid
+        if ($file && $file->isValid()) {
+            $validationRules['photo'] = [
+                'uploaded[photo]',
+                'mime_in[photo,image/jpg,image/jpeg,image/png]',
+                'max_size[photo,2048]', // 2MB max size
+            ];
+        }
+
+        // Validate the input data
+        if (!$this->validate($validationRules)) {
+            // If validation fails, remove the file input from session data
+            $inputData = $this->request->getPost();
+            unset($inputData['photo']); // Ensure the file field is not passed into the session
+
+            return redirect()->back()->with('validation', $this->validator)->with('inputData', $inputData);
+        }
+
+        // Prepare data for updating the user profile
+        $data = [
+            'username' => $this->request->getPost('username'),
+            'email' => $this->request->getPost('email'),
+            'birth' => $this->request->getPost('birth'),
+            'gender' => $this->request->getPost('gender'),
+        ];
+
+        // Handle photo upload if a new file is provided
+        if ($file && $file->isValid() && !$file->hasMoved()) {
+            $newFileName = $file->getRandomName();
+            // Move the file to the public directory
+            $file->move(WRITEPATH . '../public/uploads/profile_photos/', $newFileName); // Adjust path to public folder
+            $data['photo'] = 'uploads/profile_photos/' . $newFileName;
+
+            // Optionally delete the old profile photo if it exists
+            if (!empty($user->photo) && file_exists(WRITEPATH . '../public/' . $user->photo)) {
+                unlink(WRITEPATH . '../public/' . $user->photo);
+            }
+        }
+
+        // Update the user data in the database
+        $isUpdated = $userModel->update($user->id, $data);
+
+        // Check if the update was successful
+        if (!$isUpdated) {
+            return redirect()->back()->with('error', 'Failed to update profile. Please try again.');
+        }
+
+        // Set success message and redirect
+        return redirect()->to('/profile')->with('message', 'Profile updated successfully');
     }
 
-    // Update the user data in the database
-    $isUpdated = $userModel->update($user->id, $data);
 
-    // Check if the update was successful
-    if (!$isUpdated) {
-        return redirect()->back()->with('error', 'Failed to update profile. Please try again.');
-    }
 
-    // Set success message and redirect
-    return redirect()->to('/profile')->with('message', 'Profile updated successfully');
-}
+
+
+
+
+
 
 
 
