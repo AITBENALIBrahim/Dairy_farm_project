@@ -4,7 +4,7 @@ namespace App\Database\Migrations;
 
 use CodeIgniter\Database\Migration;
 
-class CreateUsersTable extends Migration
+class CreateAssistantsTable extends Migration
 {
     public function up()
     {
@@ -44,13 +44,19 @@ class CreateUsersTable extends Migration
             ],
             'role' => [
                 'type' => 'ENUM',
-                'constraint' => ['admin'],
-                'default' => 'admin',
+                'constraint' => ['assistant'],  // Added 'assistant' role
+                'default' => 'assistant',
+            ],
+            'created_by' => [
+                'type'       => 'INT',
+                'constraint' => 11,
+                'unsigned'   => true,
+                'null'       => true,
             ],
             'reset_token' => [
-                'type' => 'VARCHAR',
+                'type'       => 'VARCHAR',
                 'constraint' => '255',
-                'null' => true,
+                'null'       => true,
             ],
             'token_expires_at' => [
                 'type' => 'DATETIME',
@@ -71,11 +77,12 @@ class CreateUsersTable extends Migration
         ]);
 
         $this->forge->addKey('id', true);
-        $this->forge->createTable('users');
+        $this->forge->addForeignKey('created_by', 'users', 'id', 'CASCADE', 'SET NULL');  // Foreign key constraint
+        $this->forge->createTable('assistants');
     }
 
     public function down()
     {
-        $this->forge->dropTable('users');
+        $this->forge->dropTable('assistants');
     }
 }

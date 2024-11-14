@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Models\UserModel;
+use App\Models\AssistantModel;
 use CodeIgniter\I18n\Time;
 use PHPUnit\TextUI\XmlConfiguration\Validator;
 
@@ -26,13 +27,21 @@ class Auth extends BaseController
                     ->where('username', $username)
                     ->orWhere('email', $username)
                     ->first();
+                if (!$user) {
+                    $assistantModel = new AssistantModel();
+                    $user = $assistantModel->asObject()
+                        ->where('username', $username)
+                        ->orWhere('email', $username)
+                        ->first();
+                }
 
                 // Check if user exists and verify the password
                 if ($user && password_verify($password, $user->password)) {
                     session()->set([
                         'username' => $user->username,
                         'email' => $user->email,
-                        'logged_in' => true
+                        'logged_in' => true,
+                        'role' => $user->role
                     ]);
 
                     return redirect()->to('/dashboard');

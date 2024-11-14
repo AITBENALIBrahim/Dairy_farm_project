@@ -113,8 +113,10 @@
             width: 40px;
             height: 40px;
             border-radius: 50%;
+            border: 1px solid #fff;
             overflow: hidden;
             cursor: pointer;
+            padding: 2px;
         }
 
         .user-photo img {
@@ -291,6 +293,7 @@
 
             <div class="nav-top">
                 <a href="<?= base_url('/dashboard') ?>" class="<?= isActive('/dashboard') ?>"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a>
+                <a href="<?= base_url('/manage-users') ?>" class="<?= isActive('/manage-users') ?>"><i class="fas fa-user"></i> <span>Assistants</span></a>
                 <!-- Additional links can be added here if needed -->
             </div>
 

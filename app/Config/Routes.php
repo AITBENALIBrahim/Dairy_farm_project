@@ -25,11 +25,17 @@ $routes->post('auth/sendResetLink', 'Auth::sendResetLink');
 $routes->get('auth/resetPassword/(:any)', 'Auth::resetPassword/$1');
 $routes->post('auth/updatePassword', 'Auth::updatePassword');
 $routes->get('/auth/logout', 'Auth::logout');
-$routes->post('contact/submit', 'ContactController::submit');
 
 $routes->get('/dashboard', 'PageController::dashboard');
 $routes->get('/profile', 'PageController::profile');
 $routes->get('/settings', 'PageController::settings');
+$routes->get('/manage-users', 'PageController::manageUsers');
+$routes->get('/add-assistant', 'PageController::addAssistant');
+$routes->post('/save-assistant', 'PageController::saveAssistant');
+$routes->get('/edit-assistant/(:num)', 'PageController::editAssistant/$1');
+$routes->post('/update-assistant/(:num)', 'PageController::updateAssistant/$1');
+$routes->get('delete-assistant/(:segment)', 'PageController::deleteAssistant/$1');
+
 
 $routes->post('profile/update', 'Auth::updateProfile');
 
