@@ -111,19 +111,30 @@ class Auth extends BaseController
         // Get the user email from session
         $email = session()->get('email');
 
-        // Load the user model
+        // Load the user and assistant models
         $userModel = new \App\Models\UserModel();
+        $assistantModel = new \App\Models\AssistantModel();
+
+        // Determine if the user is a regular user or an assistant
         $user = $userModel->asObject()
             ->where('email', $email)
             ->first();
 
+        $isAssistant = false;
         if (!$user) {
-            return redirect()->back()->with('error', 'User not found.');
+            $user = $assistantModel->asObject()
+                ->where('username', session()->get('username'))
+                ->orWhere('email', session()->get('email'))
+                ->first();
+            if (!$user) {
+                return redirect()->back()->with('error', 'User not found.');
+            }
+            $isAssistant = true;
         }
 
         $file = $this->request->getFile('photo');
 
-        if ($file) {
+        if ($file && $file->isValid()) {
             $fileSize = $file->getSize();  // Get the file size
             log_message('debug', 'File uploaded, size: ' . $fileSize);
 
@@ -134,11 +145,10 @@ class Auth extends BaseController
             }
         }
 
-
         // Set validation rules
         $validationRules = [
-            'username' => 'required|min_length[3]|is_unique[users.username,id,' . $user->id . ']',
-            'email' => 'required|valid_email|is_unique[users.email,id,' . $user->id . ']',
+            'username' => 'required|min_length[3]|is_unique[' . ($isAssistant ? 'assistants' : 'users') . '.username,id,' . $user->id . ']',
+            'email' => 'required|valid_email|is_unique[' . ($isAssistant ? 'assistants' : 'users') . '.email,id,' . $user->id . ']',
             'birth' => 'required|valid_date',
             'gender' => 'in_list[male,female,other]',
         ];
@@ -161,7 +171,7 @@ class Auth extends BaseController
             return redirect()->back()->with('validation', $this->validator)->with('inputData', $inputData);
         }
 
-        // Prepare data for updating the user profile
+        // Prepare data for updating the profile
         $data = [
             'username' => $this->request->getPost('username'),
             'email' => $this->request->getPost('email'),
@@ -182,28 +192,20 @@ class Auth extends BaseController
             }
         }
 
-        // Update the user data in the database
-        $isUpdated = $userModel->update($user->id, $data);
+        // Update the user or assistant data in the database
+        $isUpdated = $isAssistant
+            ? $assistantModel->update($user->id, $data)
+            : $userModel->update($user->id, $data);
 
         // Check if the update was successful
         if (!$isUpdated) {
             return redirect()->back()->with('error', 'Failed to update profile. Please try again.');
         }
-
+        session()->set('username', $data['username']);
+        session()->set('email', $data['email']);
         // Set success message and redirect
         return redirect()->to('/profile')->with('message', 'Profile updated successfully');
     }
-
-
-
-
-
-
-
-
-
-
-
 
 
     public function logout()
@@ -239,25 +241,43 @@ class Auth extends BaseController
         $userModel = new UserModel();
         $user = $userModel->where('email', $email)->first();
 
+        $assistantModel = new \App\Models\AssistantModel();
+        $isAssistant = false;
+
         if (!$user) {
-            return redirect()->back()->withInput()->with('error', 'No account found with this email.');
+            $user = $assistantModel->asObject() // Retrieves the assistant as an object
+                ->where('email', $email)
+                ->first();
+            if (!$user) {
+                return redirect()->back()->withInput()->with('error', 'No account found with this email.');
+            }
+            $isAssistant = true;
         }
 
         // Generate a reset token and set its expiration
         $token = bin2hex(random_bytes(50));
-        $userModel->update($user['id'], [
+        $data = [
             'reset_token' => $token,
             'token_expires_at' => (new \DateTime())->modify('+2 hour')->format('Y-m-d H:i:s'),
-        ]);
+        ];
+
+        // Update reset token and expiration in the database
+        if ($isAssistant) {
+            // Access properties using object notation if user is an assistant
+            $assistantModel->update($user->id, $data);
+        } else {
+            // Access properties using array notation if user is a regular user
+            $userModel->update($user['id'], $data);
+        }
 
         // Send the reset email
-        if ($this->sendEmail($user['email'], $token)) {
+        $recipientEmail = $isAssistant ? $user->email : $user['email'];
+        if ($this->sendEmail($recipientEmail, $token)) {
             return redirect()->back()->with('message', 'A password reset link has been sent to your email.');
         } else {
             return redirect()->back()->with('error', 'Failed to send password reset link.');
         }
     }
-
 
 
     protected function sendEmail($email, $token)
@@ -282,6 +302,10 @@ class Auth extends BaseController
     {
         $userModel = new UserModel();
         $user = $userModel->where('reset_token', $token)->first();
+        $assistantModel = new \App\Models\AssistantModel();
+        if (!$user) {
+            $user = $assistantModel->where('reset_token', $token)->first();
+        }
 
         if (!$user || new Time($user['token_expires_at']) < Time::now()) {
             return redirect()->to('auth/forgotPassword')->with('error', 'Invalid or expired reset token.');
@@ -304,14 +328,23 @@ class Auth extends BaseController
         $token = $this->request->getPost('token');
         $userModel = new UserModel();
         $user = $userModel->where('reset_token', $token)->first();
-
+        $assistantModel = new \App\Models\AssistantModel();
+        $isAssistant = false;
         if (!$user) {
-            return redirect()->to('auth/forgotPassword')->with('error', 'Invalid reset token.');
+            $user = $assistantModel->where('reset_token', $token)->first();
+            if (!$user) {
+                return redirect()->to('auth/forgotPassword')->with('error', 'Invalid reset token.');
+            }
+            $isAssistant = true;
         }
 
         $newPassword = password_hash($this->request->getPost('password'), PASSWORD_DEFAULT);
 
-        $userModel->update($user['id'], [
+        $isAssistant ? $assistantModel->update($user['id'], [
+            'password' => $newPassword,
+            'reset_token' => null,
+            'token_expires_at' => null,
+        ]) : $userModel->update($user['id'], [
             'password' => $newPassword,
             'reset_token' => null,
             'token_expires_at' => null,
