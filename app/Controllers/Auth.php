@@ -71,25 +71,37 @@ class Auth extends BaseController
         if ($this->request->getMethod() === 'POST') {
             $rules = [
                 'username' => 'required|alpha_numeric|is_unique[users.username]',
-                'email' => 'required|valid_email|is_unique[users.email]',
+                'email'    => 'required|valid_email|is_unique[users.email]',
                 'password' => 'required|min_length[8]',
                 'cpassword' => 'required|matches[password]'
             ];
 
             if ($this->validate($rules)) {
-                $newUser = [
-                    'username' => $this->request->getPost('username'),
-                    'email' => $this->request->getPost('email'),
-                    'password' => password_hash($this->request->getPost('password'), PASSWORD_DEFAULT),
-                ];
+                // Generate a confirmation code
+                $confirmationCode = random_int(100000, 999999); // Generate a 6-digit code
 
-                $userModel = new UserModel();
-                $userModel->insert($newUser);
+                // Save the user data temporarily in session
+                session()->set([
+                    'temp_user_data' => [
+                        'username' => $this->request->getPost('username'),
+                        'email'    => $this->request->getPost('email'),
+                        'password' => password_hash($this->request->getPost('password'), PASSWORD_DEFAULT),
+                        'confirmation_code' => $confirmationCode,
+                    ]
+                ]);
 
-                return redirect()->to('auth/login');
+                // Send the confirmation code via email
+                if ($this->sendConfirmationEmail($this->request->getPost('email'), $confirmationCode)) {
+                    return redirect()->to('auth/confirmAccount')
+                        ->with('message', 'A confirmation code has been sent to your email.');
+                } else {
+                    return redirect()->to('auth/register')
+                        ->withInput()
+                        ->with('error', 'Failed to send the confirmation email.');
+                }
             }
 
-            // Set flashdata for validation
+            // Set flashdata for validation errors
             return redirect()->to(base_url('auth/register'))
                 ->withInput()
                 ->with('validation', $this->validator);
@@ -97,9 +109,82 @@ class Auth extends BaseController
 
         // If it's a GET request, just display the registration view
         return view('auth/register', [
-            'validation' => session()->getFlashdata('validation'), // Get flashdata from the session
+            'validation' => session()->getFlashdata('validation'),
         ]);
     }
+
+    protected function sendConfirmationEmail($email, $confirmationCode)
+    {
+        $emailService = \Config\Services::email();
+
+        $emailService->setTo($email);
+        $emailService->setFrom('aitbenalibrahim2001@gmail.com', 'Dairy');
+        $emailService->setSubject('Account Confirmation Code');
+        $emailService->setMessage("Your confirmation code is: <strong>{$confirmationCode}</strong>");
+
+        return $emailService->send();
+    }
+
+
+    public function resendCode()
+    {
+        // Check if there's temporary user data in the session
+        $tempUserData = session()->get('temp_user_data');
+
+        if (!$tempUserData) {
+            // If no temporary user data is found, redirect to the registration page
+            return redirect()->to('auth/register')->with('error', 'No registration data found. Please register again.');
+        }
+
+        // Generate a new confirmation code
+        $newConfirmationCode = random_int(100000, 999999);
+
+        // Update the temporary user data with the new confirmation code
+        $tempUserData['confirmation_code'] = $newConfirmationCode;
+        session()->set('temp_user_data', $tempUserData);
+
+        // Send the new confirmation code via email
+        if ($this->sendConfirmationEmail($tempUserData['email'], $newConfirmationCode)) {
+            return redirect()->to('auth/confirmAccount')
+                ->with('message', 'A new confirmation code has been sent to your email.');
+        } else {
+            return redirect()->to('auth/confirmAccount')
+                ->with('error', 'Failed to resend the confirmation email.');
+        }
+    }
+
+
+    public function confirmAccount()
+    {
+        if ($this->request->getMethod() === 'POST') {
+            $enteredCode = $this->request->getPost('confirmation_code');
+            $tempUserData = session()->get('temp_user_data');
+
+            // Check if the confirmation code matches
+            if ($tempUserData && $enteredCode == $tempUserData['confirmation_code']) {
+                // Create the new user in the database
+                $userModel = new UserModel();
+                $userModel->insert([
+                    'username' => $tempUserData['username'],
+                    'email'    => $tempUserData['email'],
+                    'password' => $tempUserData['password'],
+                ]);
+
+                // Clear temporary session data
+                session()->remove('temp_user_data');
+
+                return redirect()->to('auth/login')
+                    ->with('message', 'Your account has been confirmed. You can now log in.');
+            }
+
+            return redirect()->to('auth/confirmAccount')
+                ->with('error', 'Invalid confirmation code. Please try again.');
+        }
+
+        // Display the confirmation view
+        return view('auth/confirm_account');
+    }
+
 
     public function updateProfile()
     {
@@ -139,7 +224,7 @@ class Auth extends BaseController
             log_message('debug', 'File uploaded, size: ' . $fileSize);
 
             // Check if file size exceeds 2MB (2,048,000 bytes)
-            if ($fileSize == 0) {
+            if ($fileSize == 0 || $fileSize > 2048000) {
                 log_message('debug', 'File size exceeds 2MB, returning error.');
                 return redirect()->back()->with('error', 'File size exceeds the maximum limit of 2MB.');
             }

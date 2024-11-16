@@ -12,7 +12,7 @@
     <!-- Logo Icon -->
     <link rel="shortcut icon" href="images/logo.png" type="image/png" />
 
-    <title>Dairy Farm Management System</title>
+    <title>Dairy Farm</title>
 
     <!-- Font Awesome for icons -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js" crossorigin="anonymous"></script>
@@ -110,6 +110,57 @@
             animation: shake 0.5s;
             animation-iteration-count: 1;
         }
+
+        .user-photo {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            padding: 2px;
+            margin-left: 15px;
+        }
+
+        /* Popover styles */
+    .popover {
+        background-color: #f8f9fa; /* Light background color */
+        border: 1px solid #ccc; /* Border color */
+        border-radius: 8px; /* Rounded corners */
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+        padding: 10px; /* Padding around content */
+    }
+
+    .popover .arrow {
+        border-color: #f8f9fa; /* Arrow color to match the background */
+    }
+
+    .popover-body {
+        padding: 0; /* Remove default padding */
+    }
+
+    .popover .popover-body a {
+        display: block; /* Each link is a block */
+        padding: 8px 10px; /* Padding for links */
+        color: #343a40; /* Dark text color */
+        text-decoration: none; /* Remove underline */
+        font-size: 14px; /* Font size */
+        font-weight: 500; /* Medium font weight */
+        border-bottom: 1px solid #e9ecef; /* Divider between links */
+        transition: background-color 0.2s ease-in-out; /* Transition for hover effect */
+    }
+
+    .popover .popover-body a:last-child {
+        border-bottom: none; /* Remove border from the last item */
+    }
+
+    .popover .popover-body a:hover {
+        background-color: #e2e6ea; /* Hover background color */
+    }
+
+    /* Adjust icon styles inside the popover links */
+    .popover .popover-body a i {
+        margin-right: 8px; /* Space between icon and text */
+        color: #6c757d; /* Slightly muted icon color */
+    }
 
         @keyframes shake {
             0% {
@@ -234,7 +285,7 @@
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="#">
                 <img src="images/logo.png" alt="Logo" style="width: 45px; height: 45px; margin-right: 10px;">
-                <span id="typing-title" class="text-dark">Green Pastures Dairy Farm</span>
+                <span id="typing-title" class="text-dark">Dairy Farm</span>
             </a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -253,6 +304,19 @@
                     <li class="nav-item">
                         <a class="nav-link" href="#contact">Contact</a>
                     </li>
+                    <!-- User Photo with Tooltip -->
+                    <?php if ($session->get('logged_in')): ?>
+                        <li class="nav-item">
+                            <div class="user-photo" data-toggle="popover" data-placement="bottom" data-html="true"
+                                data-content="
+                                <a href='<?= base_url('/dashboard') ?>'><i class='fas fa-tachometer-alt'></i> Dashboard</a>
+                                <a href='<?= base_url('/profile') ?>'><i class='fas fa-user'></i> Profile</a>
+                                <a href='<?= base_url('/auth/logout') ?>'><i class='fas fa-sign-out-alt'></i> Logout</a>
+                            ">
+                                <img src="<?= $user->photo ? base_url($user->photo) : base_url('images/user.png') ?>" alt="User Photo" style="width: 40px; height: 40px; border-radius: 50%; border: 1px solid #fff;">
+                            </div>
+                        </li>
+                    <?php endif; ?>
                 </ul>
             </div>
         </div>
@@ -571,6 +635,17 @@
                 button.style.display = 'none';
             }
         };
+
+        $(document).ready(function() {
+            // Initialize popover
+            $('[data-toggle="popover"]').popover();
+
+             // Toggle sidebar visibility
+             $('#sidebar-toggle').click(function() {
+                $('#sidebar').toggleClass('hidden');
+                $('.content-area').toggleClass('shifted');
+            });
+        });
 
         // Scroll to top function
         function scrollToTop() {

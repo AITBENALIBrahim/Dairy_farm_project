@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Management</title>
+    <title>Assistant - Dairy Farm</title>
 
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -171,9 +171,6 @@
         </div>
 
 
-
-
-
         <!-- Success/Error Messages -->
         <?php if (session()->getFlashdata('message')): ?>
             <div class="alert alert-success text-center"><?= session()->getFlashdata('message') ?></div>
@@ -222,6 +219,7 @@
         <?php else: ?>
             <h3 class="text-center">No assistants added</h3>
         <?php endif; ?>
+
 
         <!-- Pagination Controls -->
         <div class="pagination-container">

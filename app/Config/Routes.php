@@ -20,6 +20,9 @@ $routes->get('/', 'Home::index'); // Home page
 // Authentication routes
 $routes->match(['GET', 'POST'], '/auth/login', 'Auth::login');
 $routes->match(['GET', 'POST'], '/auth/register', 'Auth::register');
+$routes->get('auth/confirmAccount', 'Auth::confirmAccount');
+$routes->post('auth/confirmAccount', 'Auth::confirmAccount');
+$routes->get('auth/resendCode', 'Auth::resendCode');
 $routes->get('auth/forgotPassword', 'Auth::forgotPassword');
 $routes->post('auth/sendResetLink', 'Auth::sendResetLink');
 $routes->get('auth/resetPassword/(:any)', 'Auth::resetPassword/$1');
