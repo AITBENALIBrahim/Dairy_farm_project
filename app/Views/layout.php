@@ -61,7 +61,14 @@
         }
 
         .sidebar .nav-top {
+            overflow-y: auto;
             flex-grow: 1;
+            scrollbar-width: none;
+            margin-bottom: 10px;
+        }
+
+        .sidebar .nav-top::-webkit-scrollbar {
+            display: none;
         }
 
         .sidebar a {
@@ -70,7 +77,7 @@
             padding: 10px 20px;
             font-weight: 600;
             font-size: 1rem;
-            margin-bottom: 10px;
+            margin-bottom: 7px;
             border-radius: 5px;
             text-decoration: none;
             transition: background-color 0.3s;
@@ -272,9 +279,49 @@
             text-decoration: none;
             /* Prevent the color from changing */
         }
+
         .popover-body a:hover {
             text-decoration: none;
             color: #2c3e50;
+        }
+
+        .nav-item {
+            overflow: hidden;
+            height: 50px;
+            cursor: pointer;
+            /* or your desired initial height */
+            transition: height 1s ease;
+        }
+
+        .nav-item.open {
+            height: auto;
+            /* or a value that accommodates your dropdown content */
+        }
+
+        .menu-items a {
+            font-weight: 600;
+            font-size: small;
+        }
+
+        .menu-items a span {
+            padding: 0px 15px;
+        }
+
+        .menu-head {
+            position: relative;
+        }
+
+        /* Style for the toggle icon */
+        .menu-head .toggle-icon {
+            position: absolute;
+            top: 16px;
+            right: 10px;
+            transition: transform 0.3s ease;
+        }
+
+        /* Rotate the toggle icon when the menu is open */
+        .nav-item.open .menu-head .toggle-icon {
+            transform: rotate(180deg);
         }
     </style>
 </head>
@@ -291,14 +338,61 @@
             </div>
 
             <div class="nav-top">
+                <!-- Dashboard Link -->
                 <a href="<?= base_url('/dashboard') ?>" class="<?= isActive('/dashboard') ?>"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a>
-                <a href="<?= base_url('/manage-users') ?>" class="<?= isActive('/manage-users') ?>"><i class="fas fa-user"></i> <span>Assistants</span></a>
-                <!-- Additional links can be added here if needed -->
+
+                <!-- Employee Management with arrow control -->
+                <div class="nav-item">
+                    <a class="menu-head"><i class="fas fa-users"></i> <span>Employee</span><i class="fas fa-chevron-down toggle-icon"></i></a>
+                    <div class="menu-items">
+                        <a href="<?= base_url('/employee') ?>" class="<?= isActive('/employee') ?>"><span>Employee list</span></a>
+                        <a href="<?= base_url('/salaries') ?>" class="<?= isActive('/salaries') ?>"><span>Employee salaries</span></a>
+                    </div>
+                </div>
+
+                <!-- Milk Management with arrow control -->
+                <div class="nav-item">
+                    <a class="menu-head"><i class="fas fa-wine-bottle"></i> <span>Milk</span><i class="fas fa-chevron-down toggle-icon"></i></a>
+                    <div class="menu-items">
+                        <a href="<?= base_url('/milk-collection') ?>" class="<?= isActive('/milk-collection') ?>"><span>Milk collection</span></a>
+                        <a href="<?= base_url('/milk-sales') ?>" class="<?= isActive('/milk-sales') ?>"><span>Milk sales</span></a>
+                    </div>
+                </div>
+
+                <!-- Animal Management with arrow control -->
+                <div class="nav-item">
+                    <a class="menu-head"><i class="fas fa-paw"></i> <span>Animal</span><i class="fas fa-chevron-down toggle-icon"></i></a>
+                    <div class="menu-items">
+                        <a href="<?= base_url('/cow') ?>" class="<?= isActive('/cow') ?>"><span>Cow</span></a>
+                        <a href="<?= base_url('/calf') ?>" class="<?= isActive('/calf') ?>"><span>Calf</span></a>
+                        <a href="<?= base_url('/stalls') ?>" class="<?= isActive('/stalls') ?>"><span>Stalls</span></a>
+                    </div>
+                </div>
+
+                <!-- Health Management with arrow control -->
+                <div class="nav-item">
+                    <a class="menu-head"><i class="fas fa-heartbeat"></i> <span>Health</span><i class="fas fa-chevron-down toggle-icon"></i></a>
+                    <div class="menu-items">
+                        <a href="<?= base_url('/animal-vaccinations') ?>" class="<?= isActive('/animal-vaccinations') ?>"><span>Animal Vaccinations</span></a>
+                        <a href="<?= base_url('/pregnancy-records') ?>" class="<?= isActive('/pregnancy-records') ?>"><span>Pregnancy Records</span></a>
+                    </div>
+                </div>
+
+                <!-- Additional Links -->
+                <a href="<?= base_url('/feed-chart') ?>" class="<?= isActive('/feed-chart') ?>"><i class="fas fa-chart-pie"></i> <span>Feed Chart</span></a>
+                <a href="<?= base_url('/sales') ?>" class="<?= isActive('/sales') ?>"><i class="fas fa-shopping-cart"></i> <span>Sales</span></a>
+                <a href="<?= base_url('/expenses') ?>" class="<?= isActive('/expenses') ?>"><i class="fas fa-file-invoice-dollar"></i> <span>Expenses</span></a>
+                <a href="<?= base_url('/suppliers') ?>" class="<?= isActive('/suppliers') ?>"><i class="fas fa-truck"></i> <span>Suppliers</span></a>
+                <a href="<?= base_url('/animal-routines') ?>" class="<?= isActive('/animal-routines') ?>"><i class="fas fa-sync-alt"></i> <span>Animal Routines</span></a>
+
+                <!-- Assistants Link -->
+                <a href="<?= base_url('/manage-users') ?>" class="<?= isActive('/manage-users') ?>"><i class="fas fa-users-cog"></i> <span>Assistants</span></a>
             </div>
 
             <!-- Settings Link at the Bottom -->
             <a href="<?= base_url('/settings') ?>" class="stg <?= isActive('/settings') ?>"><i class="fas fa-cog"></i> <span>Settings</span></a>
         </div>
+
 
         <!-- Main Content Area -->
         <div class="w-100">
@@ -308,17 +402,6 @@
                 <button class="btn btn-sm btn-light toggle-sidebar" id="sidebar-toggle">
                     <i class="fas fa-bars"></i>
                 </button>
-
-                <div data-toggle="popover" data-placement="bottom" data-html="true" style="cursor: pointer;"
-                    data-content="
-                    <a href='#'><i class='fas fa-drumstick-bite'></i> Cow</a>
-                    <a href='#'><i class='fas fa-baby-carriage'></i> Calf</a>
-                    <a href='#'><i class='fas fa-glass-whiskey'></i> Milk</a>
-                    <a href='#'><i class='fas fa-exchange-alt'></i> Transaction</a>
-                    <a href='#'><i class='fas fa-tag'></i> Sale</a>
-                 ">
-                    <h4><i class="fas fa-plus-circle"></i> Add <i class="fas fa-caret-down"></i></h4>
-                </div>
 
                 <!-- User Photo with Tooltip -->
                 <div class="user-photo" data-toggle="popover" data-placement="bottom" data-html="true"
@@ -351,6 +434,15 @@
             $('#sidebar-toggle').click(function() {
                 $('#sidebar').toggleClass('hidden');
                 $('.content-area').toggleClass('shifted');
+            });
+        });
+
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.querySelector('.menu-head').addEventListener('click', function() {
+                const parentItem = this.closest('.nav-item');
+
+                // Toggle the 'open' class for height transition
+                parentItem.classList.toggle('open');
             });
         });
     </script>
