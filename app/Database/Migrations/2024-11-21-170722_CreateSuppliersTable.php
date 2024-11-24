@@ -30,7 +30,7 @@ class CreateSuppliersTable extends Migration
                 'null' => true,
             ],
             'supplied_items' => [
-                'type' => 'TEXT', // You could change this to JSON if your MySQL version supports it.
+                'type' => 'TEXT',
                 'null' => true,
             ],
             'created_by' => [
@@ -40,6 +40,10 @@ class CreateSuppliersTable extends Migration
                 'null'       => true,
             ],
             'created_at' => [
+                'type'    => 'TIMESTAMP',
+                'null' => true,
+            ],
+            'updated_at' => [
                 'type'    => 'TIMESTAMP',
                 'null' => true,
             ],

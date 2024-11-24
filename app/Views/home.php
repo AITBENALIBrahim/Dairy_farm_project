@@ -121,46 +121,65 @@
         }
 
         /* Popover styles */
-    .popover {
-        background-color: #f8f9fa; /* Light background color */
-        border: 1px solid #ccc; /* Border color */
-        border-radius: 8px; /* Rounded corners */
-        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-        padding: 10px; /* Padding around content */
-    }
+        .popover {
+            background-color: #f8f9fa;
+            /* Light background color */
+            border: 1px solid #ccc;
+            /* Border color */
+            border-radius: 8px;
+            /* Rounded corners */
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            /* Subtle shadow */
+            padding: 10px;
+            /* Padding around content */
+        }
 
-    .popover .arrow {
-        border-color: #f8f9fa; /* Arrow color to match the background */
-    }
+        .popover .arrow {
+            border-color: #f8f9fa;
+            /* Arrow color to match the background */
+        }
 
-    .popover-body {
-        padding: 0; /* Remove default padding */
-    }
+        .popover-body {
+            padding: 0;
+            /* Remove default padding */
+        }
 
-    .popover .popover-body a {
-        display: block; /* Each link is a block */
-        padding: 8px 10px; /* Padding for links */
-        color: #343a40; /* Dark text color */
-        text-decoration: none; /* Remove underline */
-        font-size: 14px; /* Font size */
-        font-weight: 500; /* Medium font weight */
-        border-bottom: 1px solid #e9ecef; /* Divider between links */
-        transition: background-color 0.2s ease-in-out; /* Transition for hover effect */
-    }
+        .popover .popover-body a {
+            display: block;
+            /* Each link is a block */
+            padding: 8px 10px;
+            /* Padding for links */
+            color: #343a40;
+            /* Dark text color */
+            text-decoration: none;
+            /* Remove underline */
+            font-size: 14px;
+            /* Font size */
+            font-weight: 500;
+            /* Medium font weight */
+            border-bottom: 1px solid #e9ecef;
+            /* Divider between links */
+            transition: background-color 0.2s ease-in-out;
+            /* Transition for hover effect */
+        }
 
-    .popover .popover-body a:last-child {
-        border-bottom: none; /* Remove border from the last item */
-    }
+        .popover .popover-body a:last-child {
+            border-bottom: none;
+            /* Remove border from the last item */
+        }
 
-    .popover .popover-body a:hover {
-        background-color: #e2e6ea; /* Hover background color */
-    }
+        .popover .popover-body a:hover {
+            background-color: #e2e6ea;
+            /* Hover background color */
+        }
 
-    /* Adjust icon styles inside the popover links */
-    .popover .popover-body a i {
-        margin-right: 8px; /* Space between icon and text */
-        color: #6c757d; /* Slightly muted icon color */
-    }
+        /* Adjust icon styles inside the popover links */
+        .popover .popover-body a i {
+            margin-right: 8px;
+            /* Space between icon and text */
+            color: #6c757d;
+            /* Slightly muted icon color */
+        }
 
         @keyframes shake {
             0% {
@@ -329,10 +348,12 @@
         <div>
             <h1 class="display-4 animate__animated animate__fadeInDown">Empower Your Dairy Farm Operations</h1>
             <p class="lead animate__animated animate__fadeInUp">Streamline management, track production, and monitor herd health—all in one place.</p>
-            <div class="hero-buttons">
-                <a href="<?= base_url('auth/register') ?>" class="btn btn-success btn-lg animate__animated animate__zoomIn">Get Started</a>
-                <a href="<?= base_url('auth/login') ?>" class="btn btn-outline-light btn-lg animate__animated animate__zoomIn">Login</a>
-            </div>
+            <?php if (!$session->get('logged_in')): ?>
+                <div class="hero-buttons">
+                    <a href="<?= base_url('auth/register') ?>" class="btn btn-success btn-lg animate__animated animate__zoomIn">Get Started</a>
+                    <a href="<?= base_url('auth/login') ?>" class="btn btn-outline-light btn-lg animate__animated animate__zoomIn">Login</a>
+                </div>
+            <?php endif; ?>
         </div>
     </div>
 
@@ -640,8 +661,8 @@
             // Initialize popover
             $('[data-toggle="popover"]').popover();
 
-             // Toggle sidebar visibility
-             $('#sidebar-toggle').click(function() {
+            // Toggle sidebar visibility
+            $('#sidebar-toggle').click(function() {
                 $('#sidebar').toggleClass('hidden');
                 $('.content-area').toggleClass('shifted');
             });

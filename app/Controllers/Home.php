@@ -8,11 +8,19 @@ class Home extends BaseController
 {
     public function index()
     {
+        // Get the current user from session
         $userModel = new \App\Models\UserModel();
+        $assistantModel = new \App\Models\AssistantModel();
         $user = $userModel->asObject()
             ->where('username', session()->get('username'))
             ->orWhere('email', session()->get('email'))
             ->first();
+        if (!$user) {
+            $user = $assistantModel->asObject()
+                ->where('username', session()->get('username'))
+                ->orWhere('email', session()->get('email'))
+                ->first();
+        }
         // Get the session instance
         $session = session();
 

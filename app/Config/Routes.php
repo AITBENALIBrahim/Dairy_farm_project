@@ -39,6 +39,19 @@ $routes->get('/edit-assistant/(:num)', 'PageController::editAssistant/$1');
 $routes->post('/update-assistant/(:num)', 'PageController::updateAssistant/$1');
 $routes->get('delete-assistant/(:segment)', 'PageController::deleteAssistant/$1');
 
+$routes->get('/suppliers', 'PageController::suppliers');
+$routes->get('add-supplier', 'PageController::addSupplier');
+$routes->post('save-supplier', 'PageController::saveSupplier');
+$routes->get('edit-supplier/(:num)', 'PageController::editSupplier/$1');
+$routes->post('update-supplier/(:num)', 'PageController::updateSupplier/$1');
+$routes->get('delete-supplier/(:num)', 'PageController::deleteSupplier/$1');
+
+$routes->get('/expenses', 'PageController::expenses');
+$routes->get('add-expense', 'PageController::addExpense');
+$routes->post('save-expense', 'PageController::saveExpense');
+$routes->get('edit-expense/(:num)', 'PageController::editExpense/$1');
+$routes->post('update-expense/(:num)', 'PageController::updateExpense/$1');
+$routes->get('delete-expense/(:num)', 'PageController::deleteExpense/$1');
 
 $routes->post('profile/update', 'Auth::updateProfile');
 
