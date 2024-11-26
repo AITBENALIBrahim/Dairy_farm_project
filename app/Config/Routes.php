@@ -86,6 +86,13 @@ $routes->get('edit-employee/(:num)', 'PageController::editEmployee/$1');
 $routes->post('update-employee/(:num)', 'PageController::updateEmployee/$1');
 $routes->get('delete-employee/(:num)', 'PageController::deleteEmployee/$1');
 
+$routes->get('/salaries', 'PageController::salaries');
+$routes->get('add-salary', 'PageController::addSalary');
+$routes->post('save-salary', 'PageController::saveSalary');
+$routes->get('edit-salary/(:num)', 'PageController::editSalary/$1');
+$routes->post('update-salary/(:num)', 'PageController::updateSalary/$1');
+$routes->get('delete-salary/(:num)', 'PageController::deleteSalary/$1');
+
 $routes->post('profile/update', 'Auth::updateProfile');
 
 // Error handling routes

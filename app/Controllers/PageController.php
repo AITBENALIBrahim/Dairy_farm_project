@@ -109,7 +109,7 @@ class PageController extends BaseController
         $assistants = $assistantModel->asObject()->where('created_by', $user->id)->findAll();
 
         return view('layout', ['content' => view('pages/manage_users', ['user' => $user, 'assistants' => $assistants])]);
-    }                                                                                                                                                                       
+    }
 
     public function addAssistant()
     {
@@ -693,6 +693,192 @@ class PageController extends BaseController
             return redirect()->to('/employees')->with('error', 'Failed to delete employee');
         }
     }
+
+    public function salaries()
+    {
+        // Check if the user is logged in
+        $redirect = $this->checkLogin();
+        if ($redirect) {
+            return $redirect;
+        }
+
+        // Get the current user from session
+        $userModel = new \App\Models\UserModel();
+        $assistantModel = new \App\Models\AssistantModel();
+        $employeeModel = new \App\Models\EmployeeModel();
+        $salaryModel = new \App\Models\EmployeeSalaryModel();  // Salary model
+        $user = $userModel->asObject()
+            ->where('username', session()->get('username'))
+            ->orWhere('email', session()->get('email'))
+            ->first();
+
+        if ($user) {
+            // Get employees created by the logged-in user
+            $employees = $employeeModel->asObject()->where('created_by', $user->id)->findAll();
+            // Get salary records for these employees
+            $salaries = $salaryModel->asObject()->whereIn('employee_id', array_column($employees, 'id'))->findAll();
+        } else {
+            // If the user is an assistant
+            $user = $assistantModel->asObject()
+                ->where('username', session()->get('username'))
+                ->orWhere('email', session()->get('email'))
+                ->first();
+
+            if ($user) {
+                $employees = $employeeModel->asObject()->where('created_by', $user->created_by)->findAll();
+                $salaries = $salaryModel->asObject()->whereIn('employee_id', array_column($employees, 'id'))->findAll();
+            } else {
+                $salaries = [];
+            }
+        }
+
+        // Create an associative array with employee ids as keys and employee names as values
+        $employeeNames = [];
+        foreach ($employees as $employee) {
+            $employeeNames[$employee->id] = $employee->name;
+        }
+
+        // Append employee names to the salary records
+        foreach ($salaries as &$salary) {
+            // Assign the employee name based on the employee_id
+            $salary->employee_name = $employeeNames[$salary->employee_id] ?? 'Unknown';
+        }
+
+        return view('layout', ['content' => view('pages/salaries', ['user' => $user, 'salaries' => $salaries])]);
+    }
+
+    public function addSalary()
+    {
+        // Pass employee data to the view for selection
+        $employeeModel = new \App\Models\EmployeeModel();
+        $employees = $employeeModel->findAll();
+        return view('pages/add_salary', [
+            'validation' => session()->getFlashdata('validation'),
+            'employees' => $employees
+        ]);
+    }
+
+    public function saveSalary()
+    {
+        // Load user model to determine user role and ID
+        $userModel = new \App\Models\UserModel();
+        $assistantModel = new \App\Models\AssistantModel();
+        $currentUser = $userModel->asObject()
+            ->where('username', session()->get('username'))
+            ->orWhere('email', session()->get('email'))
+            ->first();
+
+        if (!$currentUser) {
+            $currentUser = $assistantModel->asObject()
+                ->where('username', session()->get('username'))
+                ->orWhere('email', session()->get('email'))
+                ->first();
+        }
+
+        // Determine `created_by` based on user role
+        $createdBy = null;
+        if ($currentUser) {
+            if ($currentUser->role == 'admin') {
+                $createdBy = $currentUser->id;
+            } elseif ($currentUser->role == 'assistant') {
+                $createdBy = $currentUser->created_by; // Use the ID of the admin who created the assistant
+            }
+        }
+
+        // Form validation for salary
+        if (!$this->validate([
+            'employee_id' => 'required|integer',
+            'amount_paid' => 'required|decimal',
+            'payment_date' => 'required|valid_date',
+            'payment_method' => 'required|max_length[50]',
+        ])) {
+            return redirect()->back()->withInput()->with('validation', $this->validator);
+        }
+
+        // Save the salary information
+        $salaryModel = new \App\Models\EmployeeSalaryModel();
+        $data = [
+            'employee_id' => $this->request->getPost('employee_id'),
+            'amount_paid' => $this->request->getPost('amount_paid'),
+            'payment_date' => $this->request->getPost('payment_date'),
+            'payment_method' => $this->request->getPost('payment_method'),
+            'note' => $this->request->getPost('note'),
+            'created_by' => $createdBy,
+        ];
+
+        if ($salaryModel->save($data)) {
+            return redirect()->to('/salaries')->with('message', 'Salary added successfully');
+        } else {
+            return redirect()->back()->with('error', 'There was an error adding the salary');
+        }
+    }
+
+
+    public function editSalary($id)
+    {
+        $salaryModel = new \App\Models\EmployeeSalaryModel();
+        $employeeModel = new \App\Models\EmployeeModel();
+
+        $salary = $salaryModel->find($id);
+
+        if (!$salary) {
+            return redirect()->to('/salaries')->with('error', 'Salary record not found.');
+        }
+
+        $employees = $employeeModel->findAll();
+
+        return view('pages/edit_salary', [
+            'salary' => $salary,
+            'employees' => $employees,
+            'validation' => \Config\Services::validation()
+        ]);
+    }
+
+    public function updateSalary($id)
+    {
+        // Form validation
+        $validation = $this->validate([
+            'employee_id' => 'required|numeric',
+            'amount_paid' => 'required|decimal',
+            'payment_date' => 'required|valid_date',
+            'payment_method' => 'required|max_length[100]',
+        ]);
+
+        if (!$validation) {
+            return redirect()->back()->withInput()->with('validation', $this->validator);
+        }
+
+        // Update the salary data
+        $salaryModel = new \App\Models\EmployeeSalaryModel();
+        $salaryModel->update($id, [
+            'employee_id' => $this->request->getPost('employee_id'),
+            'amount_paid' => $this->request->getPost('amount_paid'),
+            'payment_date' => $this->request->getPost('payment_date'),
+            'payment_method' => $this->request->getPost('payment_method'),
+            'note' => $this->request->getPost('note'),
+        ]);
+
+        return redirect()->to('/salaries')->with('message', 'Salary updated successfully.');
+    }
+
+    public function deleteSalary($id)
+    {
+        $salaryModel = new \App\Models\EmployeeSalaryModel();
+
+        // Check if the salary record exists
+        $salary = $salaryModel->find($id);
+        if (!$salary) {
+            return redirect()->to('/salaries')->with('error', 'Salary record not found.');
+        }
+
+        // Delete the salary record
+        if ($salaryModel->delete($id)) {
+            return redirect()->to('/salaries')->with('message', 'Salary record deleted successfully.');
+        } else {
+            return redirect()->to('/salaries')->with('error', 'Failed to delete salary record.');
+        }
+    }
+
 
     public function settings()
     {
