@@ -3,6 +3,10 @@
 namespace App\Controllers;
 
 use App\Models\AssistantModel;
+use App\Models\MilkCollectionModel;
+use App\Models\CowModel;
+use App\Models\UserModel;
+
 
 class PageController extends BaseController
 {
@@ -105,7 +109,7 @@ class PageController extends BaseController
         $assistants = $assistantModel->asObject()->where('created_by', $user->id)->findAll();
 
         return view('layout', ['content' => view('pages/manage_users', ['user' => $user, 'assistants' => $assistants])]);
-    }
+    }                                                                                                                                                                       
 
     public function addAssistant()
     {

@@ -19,6 +19,32 @@ $routes->get('/', 'Home::index'); // Home page
 
 // Authentication routes
 $routes->match(['GET', 'POST'], '/auth/login', 'Auth::login');
+
+
+$routes->post('add_milk_collection', 'MilkCollectionController::addMilkCollection');
+$routes->post('add_cow', 'CowController::addCow');
+$routes->get('milk-collection', 'MilkCollectionController::index');
+$routes->get('cow', 'CowController::cows');
+$routes->get('calves', 'CalfController::calves');
+$routes->get('stalls', 'StallController::stalls');
+
+$routes->get('vaccinations', 'VaccinationsController::vaccinations');
+$routes->get('pregnancy-records', 'PregnancyRecordsController::PregnancyRecords');
+$routes->post('add_pregnancy', 'PregnancyRecordsController::addPregnancy');
+$routes->post('add_vaccination', 'VaccinationsController::addVaccination');
+
+$routes->post('add_calf', 'CalfController::addCalf');
+$routes->post('add_stall', 'StallController::addStall');
+
+
+$routes->post('add_milk_collection', 'MilkSalesController::addMilkCollection');
+$routes->post('add_sale', 'MilkSalesController::addSale');
+$routes->get('add_sale', 'MilkSalesController::addSale');
+$routes->get('milk-sales', 'MilkSalesController::index');
+
+$routes->post('add_milk_collection', 'MilkSalesController::addMilkCollection');
+$routes->get('milk-sales', 'MilkSalesController::index');
+
 $routes->match(['GET', 'POST'], '/auth/register', 'Auth::register');
 $routes->get('auth/confirmAccount', 'Auth::confirmAccount');
 $routes->post('auth/confirmAccount', 'Auth::confirmAccount');
