@@ -12,6 +12,6 @@ class StallModel extends Model
     protected $allowedFields = ['stall_number', 'capacity', 'occupied', 'created_by', 'employee_id', 'created_at'];
 
     // Automatically set the created_at column to the current timestamp
-    protected $useTimestamps = true;
+    protected $useTimestamps = false;
     protected $createdField  = 'created_at';
 }

@@ -364,7 +364,7 @@
                     <a class="menu-head"><i class="fas fa-paw"></i> <span>Animal</span><i class="fas fa-chevron-down toggle-icon"></i></a>
                     <div class="menu-items">
                         <a href="<?= base_url('/cow') ?>" class="<?= isActive('/cow') ?>"><span>Cow</span></a>
-                        <a href="<?= base_url('/calf') ?>" class="<?= isActive('/calf') ?>"><span>Calf</span></a>
+                        <a href="<?= base_url('/calves') ?>" class="<?= isActive('/calves') ?>"><span>Calf</span></a>
                         <a href="<?= base_url('/stalls') ?>" class="<?= isActive('/stalls') ?>"><span>Stalls</span></a>
                     </div>
                 </div>
@@ -373,7 +373,7 @@
                 <div class="nav-item">
                     <a class="menu-head"><i class="fas fa-heartbeat"></i> <span>Health</span><i class="fas fa-chevron-down toggle-icon"></i></a>
                     <div class="menu-items">
-                        <a href="<?= base_url('/animal-vaccinations') ?>" class="<?= isActive('/animal-vaccinations') ?>"><span>Animal Vaccinations</span></a>
+                        <a href="<?= base_url('/vaccinations') ?>" class="<?= isActive('/vaccinations') ?>"><span>Animal Vaccinations</span></a>
                         <a href="<?= base_url('/pregnancy-records') ?>" class="<?= isActive('/pregnancy-records') ?>"><span>Pregnancy Records</span></a>
                     </div>
                 </div>
