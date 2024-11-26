@@ -345,7 +345,7 @@
                 <div class="nav-item">
                     <a class="menu-head"><i class="fas fa-users"></i> <span>Employee</span><i class="fas fa-chevron-down toggle-icon"></i></a>
                     <div class="menu-items">
-                        <a href="<?= base_url('/employee') ?>" class="<?= isActive('/employee') ?>"><span>Employee list</span></a>
+                        <a href="<?= base_url('/employees') ?>" class="<?= isActive('/employees') ?>"><span>Employee list</span></a>
                         <a href="<?= base_url('/salaries') ?>" class="<?= isActive('/salaries') ?>"><span>Employee salaries</span></a>
                     </div>
                 </div>

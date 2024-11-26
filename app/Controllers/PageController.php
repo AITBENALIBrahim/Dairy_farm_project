@@ -541,6 +541,155 @@ class PageController extends BaseController
         }
     }
 
+    public function employees()
+    {
+        // Check if the user is logged in
+        $redirect = $this->checkLogin();
+        if ($redirect) {
+            return $redirect;
+        }
+
+        // Get the current user from session
+        $userModel = new \App\Models\UserModel();
+        $assistantModel = new \App\Models\AssistantModel();
+        $employeeModel = new \App\Models\EmployeeModel();
+        $user = $userModel->asObject()
+            ->where('username', session()->get('username'))
+            ->orWhere('email', session()->get('email'))
+            ->first();
+        if ($user) {
+            $employees = $employeeModel->asObject()->where('created_by', $user->id)->findAll();
+        } else {
+            $user = $assistantModel->asObject()
+                ->where('username', session()->get('username'))
+                ->orWhere('email', session()->get('email'))
+                ->first();
+            $employees = $employeeModel->asObject()->where('created_by', $user->created_by)->findAll();
+        }
+        return view('layout', ['content' => view('pages/employees', ['user' => $user, 'employees' => $employees])]);
+    }
+
+    public function addEmployee()
+    {
+        return view('pages/add_employee', [
+            'validation' => session()->getFlashdata('validation')
+        ]);
+    }
+
+    public function saveEmployee()
+    {
+        // Load user model to determine user role and ID
+        $userModel = new \App\Models\UserModel();
+        $assistantModel = new \App\Models\AssistantModel();
+        $currentUser = $userModel->asObject()
+            ->where('username', session()->get('username'))
+            ->orWhere('email', session()->get('email'))
+            ->first();
+        if (!$currentUser) {
+            $currentUser = $assistantModel->asObject()
+                ->where('username', session()->get('username'))
+                ->orWhere('email', session()->get('email'))
+                ->first();
+        }
+
+        // Determine `created_by` based on user role
+        $createdBy = null;
+        if ($currentUser) {
+            if ($currentUser->role == 'admin') {
+                $createdBy = $currentUser->id;
+            } elseif ($currentUser->role == 'assistant') {
+                $createdBy = $currentUser->created_by; // Use the ID of the admin who created the assistant
+            }
+        }
+
+        // Form validation
+        if (!$this->validate([
+            'name' => 'required|max_length[100]',
+            'position' => 'required|max_length[100]',
+            'salary' => 'required|decimal',
+            'hire_date' => 'required|valid_date',
+        ])) {
+            return redirect()->back()->withInput()->with('validation', $this->validator);
+        }
+
+        // Save the new employee
+        $employeeModel = new \App\Models\EmployeeModel();
+        $data = [
+            'name' => $this->request->getPost('name'),
+            'position' => $this->request->getPost('position'),
+            'salary' => $this->request->getPost('salary'),
+            'hire_date' => $this->request->getPost('hire_date'),
+            'status' => $this->request->getPost('status'),
+            'created_by' => $createdBy,
+        ];
+
+        if ($employeeModel->save($data)) {
+            return redirect()->to('/employees')->with('message', 'Employee added successfully');
+        } else {
+            return redirect()->back()->with('error', 'There was an error adding the employee');
+        }
+    }
+
+    public function editEmployee($id)
+    {
+        $employeeModel = new \App\Models\EmployeeModel();
+        $employee = $employeeModel->find($id);
+
+        if (!$employee) {
+            return redirect()->to('/employees')->with('error', 'Employee not found.');
+        }
+
+        return view('pages/edit_employee', [
+            'employee' => $employee,
+            'validation' => \Config\Services::validation()
+        ]);
+    }
+
+    public function updateEmployee($id)
+    {
+        // Form validation
+        $validation = $this->validate([
+            'name' => 'required|max_length[100]',
+            'position' => 'required|max_length[100]',
+            'salary' => 'required|decimal',
+            'hire_date' => 'required|valid_date',
+        ]);
+
+        if (!$validation) {
+            return redirect()->back()->withInput()->with('validation', $this->validator);
+        }
+
+        // Update the employee data
+        $employeeModel = new \App\Models\EmployeeModel();
+        $employeeModel->update($id, [
+            'name' => $this->request->getPost('name'),
+            'position' => $this->request->getPost('position'),
+            'salary' => $this->request->getPost('salary'),
+            'hire_date' => $this->request->getPost('hire_date'),
+            'status' => $this->request->getPost('status'), // Optional status update
+        ]);
+
+        return redirect()->to('/employees')->with('message', 'Employee updated successfully.');
+    }
+
+    public function deleteEmployee($id)
+    {
+        $employeeModel = new \App\Models\EmployeeModel();
+
+        // Check if the employee exists
+        $employee = $employeeModel->find($id);
+        if (!$employee) {
+            return redirect()->to('/employees')->with('error', 'Employee not found');
+        }
+
+        // Delete the employee
+        if ($employeeModel->delete($id)) {
+            return redirect()->to('/employees')->with('message', 'Employee deleted successfully');
+        } else {
+            return redirect()->to('/employees')->with('error', 'Failed to delete employee');
+        }
+    }
+
     public function settings()
     {
         // Check if the user is logged in

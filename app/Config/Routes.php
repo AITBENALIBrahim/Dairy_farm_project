@@ -53,6 +53,13 @@ $routes->get('edit-expense/(:num)', 'PageController::editExpense/$1');
 $routes->post('update-expense/(:num)', 'PageController::updateExpense/$1');
 $routes->get('delete-expense/(:num)', 'PageController::deleteExpense/$1');
 
+$routes->get('/employees', 'PageController::employees');
+$routes->get('add-employee', 'PageController::addEmployee');
+$routes->post('save-employee', 'PageController::saveEmployee');
+$routes->get('edit-employee/(:num)', 'PageController::editEmployee/$1');
+$routes->post('update-employee/(:num)', 'PageController::updateEmployee/$1');
+$routes->get('delete-employee/(:num)', 'PageController::deleteEmployee/$1');
+
 $routes->post('profile/update', 'Auth::updateProfile');
 
 // Error handling routes
