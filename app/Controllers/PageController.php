@@ -249,8 +249,301 @@ class PageController extends BaseController
     }
 
 
+    public function suppliers()
+    {
+        // Check if the user is logged in
+        $redirect = $this->checkLogin();
+        if ($redirect) {
+            return $redirect;
+        }
 
+        // Get the current user from session
+        $userModel = new \App\Models\UserModel();
+        $assistantModel = new \App\Models\AssistantModel();
+        $supplierModel = new \App\Models\SupplierModel();
+        $user = $userModel->asObject()
+            ->where('username', session()->get('username'))
+            ->orWhere('email', session()->get('email'))
+            ->first();
+        if ($user) {
+            $suppliers = $supplierModel->asObject()->where('created_by', $user->id)->findAll();
+        } else {
+            $user = $assistantModel->asObject()
+                ->where('username', session()->get('username'))
+                ->orWhere('email', session()->get('email'))
+                ->first();
+            $suppliers = $supplierModel->asObject()->where('created_by', $user->created_by)->findAll();
+        }
+        return view('layout', ['content' => view('pages/suppliers', ['user' => $user, 'suppliers' => $suppliers])]);
+    }
 
+    public function addSupplier()
+    {
+        return view('pages/add_supplier', [
+            'validation' => session()->getFlashdata('validation') // Retrieve flashdata
+        ]); // Load the view to add an assistant
+    }
+
+    public function saveSupplier()
+    {
+        // Load user model to determine user role and ID
+        $userModel = new \App\Models\UserModel();
+        $assistantModel = new \App\Models\AssistantModel();
+        $currentUser = $userModel->asObject()
+            ->where('username', session()->get('username'))
+            ->orWhere('email', session()->get('email'))
+            ->first();
+        if (!$currentUser) {
+            $currentUser = $assistantModel->asObject()
+                ->where('username', session()->get('username'))
+                ->orWhere('email', session()->get('email'))
+                ->first();
+        }
+
+        // Determine `created_by` based on user role
+        $createdBy = null;
+        if ($currentUser) {
+            if ($currentUser->role == 'admin') {
+                $createdBy = $currentUser->id;
+            } elseif ($currentUser->role == 'assistant') {
+                $createdBy = $currentUser->created_by; // Use the ID of the admin who created the assistant
+            }
+        }
+
+        // Form validation
+        if (!$this->validate([
+            'name' => 'required|max_length[100]',
+            'contact_number' => 'required|max_length[20]',
+            'address' => 'required',
+            'supplied_items' => 'required',
+        ])) {
+            return redirect()->back()->withInput()->with('validation', $this->validator);
+        }
+
+        // Save the new supplier
+        $supplierModel = new \App\Models\SupplierModel();
+        $data = [
+            'name' => $this->request->getPost('name'),
+            'contact_number' => $this->request->getPost('contact_number'),
+            'address' => $this->request->getPost('address'),
+            'supplied_items' => $this->request->getPost('supplied_items'),
+            'created_by' => $createdBy,
+        ];
+
+        if ($supplierModel->save($data)) {
+            return redirect()->to('/suppliers')->with('message', 'Supplier added successfully');
+        } else {
+            return redirect()->back()->with('error', 'There was an error adding the supplier');
+        }
+    }
+
+    // Load the edit form with existing supplier data
+    public function editSupplier($id)
+    {
+        $supplierModel = new \App\Models\SupplierModel();
+        $supplier = $supplierModel->find($id);
+
+        if (!$supplier) {
+            return redirect()->to('/suppliers')->with('error', 'Supplier not found.');
+        }
+
+        return view('pages/edit_supplier', [
+            'supplier' => $supplier,
+            'validation' => \Config\Services::validation()
+        ]);
+    }
+
+    // Update supplier data
+    public function updateSupplier($id)
+    {
+        $validation = $this->validate([
+            'name' => 'required|min_length[3]',
+            'contact_number' => 'required|min_length[10]',
+            'address' => 'required',
+            'supplied_items' => 'required',
+        ]);
+
+        if (!$validation) {
+            return redirect()->back()->withInput()->with('validation', $this->validator);
+        }
+
+        $supplierModel = new \App\Models\SupplierModel();
+        $supplierModel->update($id, [
+            'name' => $this->request->getPost('name'),
+            'contact_number' => $this->request->getPost('contact_number'),
+            'address' => $this->request->getPost('address'),
+            'supplied_items' => $this->request->getPost('supplied_items'),
+        ]);
+
+        return redirect()->to('/suppliers')->with('message', 'Supplier updated successfully.');
+    }
+
+    // Delete supplier function
+    public function deleteSupplier($id)
+    {
+        $supplierModel = new \App\Models\SupplierModel();
+
+        // Check if the supplier exists
+        $supplier = $supplierModel->find($id);
+        if (!$supplier) {
+            return redirect()->to('/suppliers')->with('error', 'Supplier not found');
+        }
+
+        // Delete the supplier
+        if ($supplierModel->delete($id)) {
+            return redirect()->to('/suppliers')->with('message', 'Supplier deleted successfully');
+        } else {
+            return redirect()->to('/suppliers')->with('error', 'Failed to delete supplier');
+        }
+    }
+
+    public function expenses()
+    {
+        // Check if the user is logged in
+        $redirect = $this->checkLogin();
+        if ($redirect) {
+            return $redirect;
+        }
+
+        // Get the current user from session
+        $userModel = new \App\Models\UserModel();
+        $assistantModel = new \App\Models\AssistantModel();
+        $expenseModel = new \App\Models\ExpenseModel();
+        $user = $userModel->asObject()
+            ->where('username', session()->get('username'))
+            ->orWhere('email', session()->get('email'))
+            ->first();
+        if ($user) {
+            $expenses = $expenseModel->asObject()->where('created_by', $user->id)->findAll();
+        } else {
+            $user = $assistantModel->asObject()
+                ->where('username', session()->get('username'))
+                ->orWhere('email', session()->get('email'))
+                ->first();
+            $expenses = $expenseModel->asObject()->where('created_by', $user->created_by)->findAll();
+        }
+        return view('layout', ['content' => view('pages/expenses', ['user' => $user, 'expenses' => $expenses])]);
+    }
+
+    public function addExpense()
+    {
+        return view('pages/add_expense', [
+            'validation' => session()->getFlashdata('validation')
+        ]);
+    }
+
+    public function saveExpense()
+    {
+        // Load user model to determine user role and ID
+        $userModel = new \App\Models\UserModel();
+        $assistantModel = new \App\Models\AssistantModel();
+        $currentUser = $userModel->asObject()
+            ->where('username', session()->get('username'))
+            ->orWhere('email', session()->get('email'))
+            ->first();
+        if (!$currentUser) {
+            $currentUser = $assistantModel->asObject()
+                ->where('username', session()->get('username'))
+                ->orWhere('email', session()->get('email'))
+                ->first();
+        }
+
+        // Determine `created_by` based on user role
+        $createdBy = null;
+        if ($currentUser) {
+            if ($currentUser->role == 'admin') {
+                $createdBy = $currentUser->id;
+            } elseif ($currentUser->role == 'assistant') {
+                $createdBy = $currentUser->created_by; // Use the ID of the admin who created the assistant
+            }
+        }
+
+        // Form validation
+        if (!$this->validate([
+            'expense_date' => 'required',
+            'expense_type' => 'required|max_length[50]',
+            'amount' => 'required|decimal',
+            'description' => 'required',
+        ])) {
+            return redirect()->back()->withInput()->with('validation', $this->validator);
+        }
+
+        // Save the new expense
+        $expenseModel = new \App\Models\ExpenseModel();
+        $data = [
+            'expense_date' => $this->request->getPost('expense_date'),
+            'expense_type' => $this->request->getPost('expense_type'),
+            'amount' => $this->request->getPost('amount'),
+            'description' => $this->request->getPost('description'),
+            'created_by' => $createdBy,
+        ];
+
+        if ($expenseModel->save($data)) {
+            return redirect()->to('/expenses')->with('message', 'Expense added successfully');
+        } else {
+            return redirect()->back()->with('error', 'There was an error adding the expense');
+        }
+    }
+
+    // Edit expense form
+    public function editExpense($id)
+    {
+        $expenseModel = new \App\Models\ExpenseModel();
+        $expense = $expenseModel->find($id);
+
+        if (!$expense) {
+            return redirect()->to('/expenses')->with('error', 'Expense not found.');
+        }
+
+        return view('pages/edit_expense', [
+            'expense' => $expense,
+            'validation' => \Config\Services::validation()
+        ]);
+    }
+
+    // Update expense data
+    public function updateExpense($id)
+    {
+        $validation = $this->validate([
+            'expense_date' => 'required|valid_date',
+            'expense_type' => 'required|min_length[3]',
+            'amount' => 'required|decimal',
+            'description' => 'required|min_length[3]',
+        ]);
+
+        if (!$validation) {
+            return redirect()->back()->withInput()->with('validation', $this->validator);
+        }
+
+        $expenseModel = new \App\Models\ExpenseModel();
+        $expenseModel->update($id, [
+            'expense_date' => $this->request->getPost('expense_date'),
+            'expense_type' => $this->request->getPost('expense_type'),
+            'amount' => $this->request->getPost('amount'),
+            'description' => $this->request->getPost('description'),
+        ]);
+
+        return redirect()->to('/expenses')->with('message', 'Expense updated successfully.');
+    }
+
+    // Delete expense
+    public function deleteExpense($id)
+    {
+        $expenseModel = new \App\Models\ExpenseModel();
+
+        // Check if the expense exists
+        $expense = $expenseModel->find($id);
+        if (!$expense) {
+            return redirect()->to('/expenses')->with('error', 'Expense not found');
+        }
+
+        // Delete the expense
+        if ($expenseModel->delete($id)) {
+            return redirect()->to('/expenses')->with('message', 'Expense deleted successfully');
+        } else {
+            return redirect()->to('/expenses')->with('error', 'Failed to delete expense');
+        }
+    }
 
     public function settings()
     {

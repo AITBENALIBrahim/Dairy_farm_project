@@ -1,4 +1,3 @@
-<!-- app/Views/add_assistant.php -->
 <!doctype html>
 <html lang="en">
 
@@ -7,15 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <title>Add New Assistant</title>
+    <title>Add New Expense</title>
     <link rel="shortcut icon" href="<?= base_url('images/logo.png') ?>" type="image/png" />
     <style>
-        /* Body margin adjustment */
         body {
-            margin-top: 10px;
+            margin-top: 20px;
         }
 
-        .assistant-container {
+        .expense-container {
             max-width: 700px;
             width: 500px;
             background-color: #ffffff;
@@ -23,7 +21,7 @@
             border-radius: 8px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
             animation: fadeIn 1s ease-in-out;
-            margin-top: 10px;
+            margin-top: 90px;
             margin-bottom: 30px;
         }
 
@@ -32,13 +30,13 @@
             margin-bottom: 1.5rem;
         }
 
-        .assistant-logo {
+        .expense-logo {
             width: 80px;
             height: 80px;
             margin-bottom: 15px;
         }
 
-        .assistant-container h3 {
+        .expense-container h3 {
             color: #2c3e50;
             font-weight: 700;
             font-size: 1.8rem;
@@ -92,10 +90,10 @@
 
 <body class="d-flex align-items-center bg-light" style="height: 100vh;">
     <div class="container d-flex justify-content-center">
-        <div class="assistant-container">
+        <div class="expense-container">
             <div class="logo-title-container">
-                <img src="<?= base_url('images/logo.png') ?>" alt="Logo" class="assistant-logo">
-                <h3 class="text-center">Add New Assistant</h3>
+                <img src="<?= base_url('images/logo.png') ?>" alt="Logo" class="expense-logo">
+                <h3 class="text-center">Add New Expense</h3>
             </div>
 
             <?php if (session()->has('error')): ?>
@@ -104,59 +102,75 @@
                 </div>
             <?php endif; ?>
 
-            <!-- Add Assistant Form -->
-            <form action="<?= base_url('save-assistant') ?>" method="POST">
+            <!-- Add Expense Form -->
+            <form action="<?= base_url('save-expense') ?>" method="POST">
                 <?= csrf_field() ?>
 
-                <!-- Email Field -->
+                <!-- Expense Type -->
                 <div class="form-group">
-                    <label for="email" class="d-block text-left">Email</label>
-                    <div class="input-group <?= $validation && $validation->hasError('email') ? 'is-invalid' : '' ?>">
+                    <label for="expense_type">Expense Type</label>
+                    <div class="input-group <?= $validation && $validation->hasError('expense_type') ? 'is-invalid' : '' ?>">
                         <div class="input-group-prepend">
-                            <span class="fas fa-envelope"></span>
+                            <span class="fas fa-dollar-sign"></span>
                         </div>
-                        <input autocomplete="off" type="text" name="email" id="email" class="form-control <?= $validation && $validation->hasError('email') ? 'is-invalid' : '' ?>" value="<?= old('email') ?>" placeholder="Enter email">
+                        <input type="text" name="expense_type" id="expense_type" class="form-control <?= $validation && $validation->hasError('expense_type') ? 'is-invalid' : '' ?>" value="<?= old('expense_type') ?>" placeholder="Enter expense type">
                     </div>
-                    <?php if ($validation && $validation->hasError('email')): ?>
+                    <?php if ($validation && $validation->hasError('expense_type')): ?>
                         <div class="invalid-feedback text-left">
-                            <?= esc($validation->getError('email')) ?>
+                            <?= esc($validation->getError('expense_type')) ?>
                         </div>
                     <?php endif; ?>
                 </div>
 
-                <!-- Username Field -->
+                <!-- Expense Date -->
                 <div class="form-group">
-                    <label for="username" class="d-block text-left">Username</label>
-                    <div class="input-group <?= $validation && $validation->hasError('username') ? 'is-invalid' : '' ?>">
+                    <label for="expense_date">Expense Date</label>
+                    <div class="input-group <?= $validation && $validation->hasError('expense_date') ? 'is-invalid' : '' ?>">
                         <div class="input-group-prepend">
-                            <span class="fas fa-user"></span>
+                            <span class="fas fa-calendar-alt"></span>
                         </div>
-                        <input autocomplete="off" type="text" name="username" id="username" class="form-control <?= $validation && $validation->hasError('username') ? 'is-invalid' : '' ?>" value="<?= old('username') ?>" placeholder="Enter username">
+                        <input type="date" name="expense_date" id="expense_date" class="form-control <?= $validation && $validation->hasError('expense_date') ? 'is-invalid' : '' ?>" value="<?= old('expense_date') ?>">
                     </div>
-                    <?php if ($validation && $validation->hasError('username')): ?>
+                    <?php if ($validation && $validation->hasError('expense_date')): ?>
                         <div class="invalid-feedback text-left">
-                            <?= esc($validation->getError('username')) ?>
+                            <?= esc($validation->getError('expense_date')) ?>
                         </div>
                     <?php endif; ?>
                 </div>
 
-                <!-- Password Field -->
+                <!-- Amount -->
                 <div class="form-group">
-                    <label for="password" class="d-block text-left">Password</label>
-                    <div class="input-group <?= $validation && $validation->hasError('password') ? 'is-invalid' : '' ?>">
+                    <label for="amount">Amount</label>
+                    <div class="input-group <?= $validation && $validation->hasError('amount') ? 'is-invalid' : '' ?>">
                         <div class="input-group-prepend">
-                            <span class="fas fa-lock"></span>
+                            <span class="fas fa-money-bill-wave"></span>
                         </div>
-                        <input type="password" name="password" id="password" class="form-control <?= $validation && $validation->hasError('password') ? 'is-invalid' : '' ?>" placeholder="Enter password">
+                        <input type="number" step="0.01" name="amount" id="amount" class="form-control <?= $validation && $validation->hasError('amount') ? 'is-invalid' : '' ?>" value="<?= old('amount') ?>" placeholder="Enter amount">
                     </div>
-                    <?php if ($validation && $validation->hasError('password')): ?>
+                    <?php if ($validation && $validation->hasError('amount')): ?>
                         <div class="invalid-feedback text-left">
-                            <?= esc($validation->getError('password')) ?>
+                            <?= esc($validation->getError('amount')) ?>
                         </div>
                     <?php endif; ?>
                 </div>
 
-                <button type="submit" class="btn btn-success btn-block">Save Assistant</button>
+                <!-- Description -->
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <div class="input-group <?= $validation && $validation->hasError('description') ? 'is-invalid' : '' ?>">
+                        <div class="input-group-prepend">
+                            <span class="fas fa-comment"></span>
+                        </div>
+                        <textarea name="description" id="description" class="form-control <?= $validation && $validation->hasError('description') ? 'is-invalid' : '' ?>" placeholder="Enter expense description"><?= old('description') ?></textarea>
+                    </div>
+                    <?php if ($validation && $validation->hasError('description')): ?>
+                        <div class="invalid-feedback text-left">
+                            <?= esc($validation->getError('description')) ?>
+                        </div>
+                    <?php endif; ?>
+                </div>
+
+                <button type="submit" class="btn btn-success btn-block">Save Expense</button>
             </form>
         </div>
     </div>

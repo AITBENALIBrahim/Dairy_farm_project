@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Assistant - Dairy Farm</title>
+    <title>Suppliers - Dairy Farm</title>
 
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -149,40 +149,25 @@
             font-size: 1rem;
             /* Adjust the icon size if needed */
         }
-
-        .page-item.active .page-link {
-            background-color: #007bff;
-            /* Highlight color */
-            color: white;
-            border-color: #007bff;
-        }
-
-        .page-item.disabled .page-link {
-            color: #6c757d;
-            pointer-events: none;
-            cursor: not-allowed;
-        }
     </style>
 </head>
 
 <body class="d-flex align-items-center bg-light" style="height: 100vh;">
     <div class="container">
 
-        <!-- Button to add a new assistant and the search bar -->
+        <!-- Button to add a new supplier and the search bar -->
         <div class="d-flex justify-content-between align-items-center">
-            <!-- Search bar with search icon inside the input -->
             <div class="position-relative" style="max-width: 300px;">
-                <input type="text" id="search-bar" class="form-control pr-4" placeholder="Search assistants..." oninput="searchAssistants()">
+                <input type="text" id="search-bar" class="form-control pr-4" placeholder="Search suppliers..." oninput="searchSuppliers()">
                 <i class="fas fa-search search-icon"></i>
             </div>
 
             <div class="text">
-                <a href="<?= base_url('add-assistant') ?>" class="btn btn-success mt-3">
-                    <i class="fas fa-plus"></i> Add New Assistant
+                <a href="<?= base_url('add-supplier') ?>" class="btn btn-success mt-3">
+                    <i class="fas fa-plus"></i> Add New Supplier
                 </a>
             </div>
         </div>
-
 
         <!-- Success/Error Messages -->
         <?php if (session()->getFlashdata('message')): ?>
@@ -192,36 +177,33 @@
             <div class="alert alert-danger text-center"><?= session()->getFlashdata('error') ?></div>
         <?php endif; ?>
 
-        <!-- Table for displaying assistants -->
-        <?php if ($assistants): ?>
+        <!-- Table for displaying suppliers -->
+        <?php if ($suppliers): ?>
             <table class="table table-striped">
                 <thead>
                     <tr>
                         <th style="width: 70px;">ID</th>
-                        <th style="width: 90px;">Photo</th>
-                        <th>Username</th>
-                        <th>Email</th>
-                        <th style="width: 120px;">Role</th>
+                        <th>Name</th>
+                        <th>Contact Number</th>
+                        <th>Address</th>
+                        <th>Supplied Items</th>
                         <th style="width: 200px;">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($assistants as $assistant): ?>
+                    <?php foreach ($suppliers as $supplier): ?>
                         <tr>
-                            <td><?= $assistant->id ?></td>
+                            <td><?= $supplier->id ?></td>
+                            <td><?= $supplier->name ?></td>
+                            <td><?= $supplier->contact_number ?></td>
+                            <td><?= $supplier->address ?></td>
+                            <td><?= $supplier->supplied_items ?></td>
                             <td>
-                                <img src="<?= $assistant->photo ? base_url($assistant->photo) : base_url('images/user.png') ?>"
-                                    alt="User Photo" class="user-photo">
-                            </td>
-                            <td><?= $assistant->username ?></td>
-                            <td><?= $assistant->email ?></td>
-                            <td><?= ucfirst($assistant->role) ?></td>
-                            <td>
-                                <a href="<?= base_url('edit-assistant/' . $assistant->id) ?>" class="btn btn-sm btn-info">
+                                <a href="<?= base_url('edit-supplier/' . $supplier->id) ?>" class="btn btn-sm btn-info">
                                     <i class="fas fa-edit"></i> Edit
                                 </a>
-                                <a href="<?= base_url('delete-assistant/' . $assistant->id) ?>" class="btn btn-sm btn-danger"
-                                    onclick="return confirm('Are you sure you want to delete this assistant?');">
+                                <a href="<?= base_url('delete-supplier/' . $supplier->id) ?>" class="btn btn-sm btn-danger"
+                                    onclick="return confirm('Are you sure you want to delete this supplier?');">
                                     <i class="fas fa-trash"></i> Delete
                                 </a>
                             </td>
@@ -230,16 +212,13 @@
                 </tbody>
             </table>
         <?php else: ?>
-            <h3 class="text-center">No assistants added</h3>
+            <h3 class="text-center">No suppliers added</h3>
         <?php endif; ?>
-
 
         <!-- Pagination Controls -->
         <div class="pagination-container">
-            <span id="pagination-count"></span> <!-- Display the current page and total pages -->
-            <ul class="pagination" id="pagination">
-                <!-- Pagination buttons will be dynamically added by JavaScript -->
-            </ul>
+            <span id="pagination-count"></span>
+            <ul class="pagination" id="pagination"></ul>
         </div>
     </div>
 
@@ -248,39 +227,39 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js" integrity="sha384-pzjw8f+ua7Kw1TIq0M8Fq1hnwz8d8Ck93k0xt0Q4LmZOL2BxDd6DTRt+ro+/pz8D" crossorigin="anonymous"></script>
 
     <script>
-        // Sample data (replace with your actual assistant data array)
-        let assistants = <?= json_encode($assistants) ?>;
+        // Sample data (replace with your actual supplier data array)
+        let suppliers = <?= json_encode($suppliers) ?>;
         let itemsPerPage = 5; // Default items per page
         let currentPage = 1; // Track the current page
-        let filteredAssistants = assistants; // Variable to hold filtered data for search
+        let filteredSuppliers = suppliers; // Variable to hold filtered data for search
 
         // Function to render the table with paginated data
         function renderTable(page) {
             const start = (page - 1) * itemsPerPage;
             const end = start + itemsPerPage;
-            const paginatedData = filteredAssistants.slice(start, end);
+            const paginatedData = filteredSuppliers.slice(start, end);
             const tableBody = document.querySelector('table tbody');
             tableBody.innerHTML = ''; // Clear previous table rows
 
             // Add rows for the current page
-            paginatedData.forEach(assistant => {
+            paginatedData.forEach(supplier => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${assistant.id}</td>
-                    <td><img src="${assistant.photo || 'images/user.png'}" alt="User Photo" class="user-photo"></td>
-                    <td>${assistant.username}</td>
-                    <td>${assistant.email}</td>
-                    <td>${assistant.role.charAt(0).toUpperCase() + assistant.role.slice(1)}</td>
+                    <td>${supplier.id}</td>
+                    <td>${supplier.name}</td>
+                    <td>${supplier.contact_number}</td>
+                    <td>${supplier.address}</td>
+                    <td>${supplier.supplied_items}</td>
                     <td>
-                        <a href="/edit-assistant/${assistant.id}" class="btn btn-sm btn-info"><i class="fas fa-edit"></i> Edit</a>
-                        <a href="/delete-assistant/${assistant.id}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this assistant?');"><i class="fas fa-trash"></i> Delete</a>
+                        <a href="/edit-supplier/${supplier.id}" class="btn btn-sm btn-info"><i class="fas fa-edit"></i> Edit</a>
+                        <a href="/delete-supplier/${supplier.id}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this supplier?');"><i class="fas fa-trash"></i> Delete</a>
                     </td>
                 `;
                 tableBody.appendChild(row);
             });
 
             // Update pagination count
-            document.getElementById('pagination-count').textContent = `Page ${page} of ${Math.ceil(filteredAssistants.length / itemsPerPage)}`;
+            document.getElementById('pagination-count').textContent = `Page ${page} of ${Math.ceil(filteredSuppliers.length / itemsPerPage)}`;
 
             // Update pagination buttons
             updatePaginationButtons(page);
@@ -288,7 +267,7 @@
 
         function createPagination() {
             const pagination = document.getElementById('pagination');
-            const totalPages = Math.ceil(filteredAssistants.length / itemsPerPage);
+            const totalPages = Math.ceil(filteredSuppliers.length / itemsPerPage);
 
             // Clear previous pagination buttons
             pagination.innerHTML = '';
@@ -320,7 +299,7 @@
 
         function updatePaginationButtons(page) {
             const pagination = document.getElementById('pagination');
-            const totalPages = Math.ceil(filteredAssistants.length / itemsPerPage);
+            const totalPages = Math.ceil(filteredSuppliers.length / itemsPerPage);
 
             // Disable Previous button on first page
             pagination.children[0].classList.toggle('disabled', page === 1);
@@ -340,7 +319,7 @@
 
         // Change page and render new data
         function changePage(page) {
-            const totalPages = Math.ceil(filteredAssistants.length / itemsPerPage);
+            const totalPages = Math.ceil(filteredSuppliers.length / itemsPerPage);
 
             // Ensure page stays within bounds
             if (page < 1) page = 1;
@@ -350,15 +329,15 @@
             renderTable(page);
         }
 
-        // Search assistants based on input
-        function searchAssistants() {
+        // Search suppliers based on input
+        function searchSuppliers() {
             const searchTerm = document.getElementById('search-bar').value.toLowerCase();
 
-            filteredAssistants = assistants.filter(assistant => {
+            filteredSuppliers = suppliers.filter(supplier => {
                 return (
-                    assistant.username.toLowerCase().includes(searchTerm) ||
-                    assistant.email.toLowerCase().includes(searchTerm) ||
-                    assistant.role.toLowerCase().includes(searchTerm)
+                    supplier.username.toLowerCase().includes(searchTerm) ||
+                    supplier.email.toLowerCase().includes(searchTerm) ||
+                    supplier.role.toLowerCase().includes(searchTerm)
                 );
             });
 
@@ -372,8 +351,6 @@
         createPagination();
         renderTable(currentPage);
     </script>
-
-
 </body>
 
 </html>

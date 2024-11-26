@@ -9,9 +9,10 @@ class ExpenseModel extends Model
     protected $table      = 'expenses';
     protected $primaryKey = 'id';
 
-    protected $allowedFields = ['expense_date', 'expense_type', 'amount', 'description', 'created_by', 'created_at'];
+    protected $allowedFields = ['expense_date', 'expense_type', 'amount', 'description', 'created_by', 'created_at', 'updated_at'];
 
     // Automatically manage timestamps
     protected $useTimestamps = true;
-    protected $createdField  = 'created_at';
+    protected $createdField = 'created_at';
+    protected $updatedField = 'updated_at';
 }

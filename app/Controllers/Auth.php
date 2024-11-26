@@ -44,7 +44,7 @@ class Auth extends BaseController
                         'role' => $user->role
                     ]);
 
-                    return redirect()->to('/dashboard');
+                    return redirect()->to('/');
                 }
 
                 // Flash error message for invalid credentials
