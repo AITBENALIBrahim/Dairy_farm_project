@@ -15,6 +15,6 @@ class FeedChartModel extends Model
     ];
 
     // Automatically manage timestamps
-    protected $useTimestamps = true;
+    protected $useTimestamps = false;
     protected $createdField  = 'created_at';
 }

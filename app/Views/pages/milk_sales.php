@@ -1,101 +1,118 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <title>Milk Sales</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            margin-top: 10px;
+        }
+
+        .sales-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .sales-container h3 {
+            color: #2c3e50;
+            font-weight: 700;
+            font-size: 1.8rem;
+        }
+
+        .btn-success,
+        .btn-primary {
+            font-weight: 600;
+            border-radius: 5px;
+        }
+
+        .btn-success {
+            background-color: #27ae60;
+            border-color: #27ae60;
+        }
+
+        .btn-primary {
+            background-color: #3498db;
+            border-color: #3498db;
+        }
+
+        .btn-success:hover {
+            background-color: #2ecc71;
+            border-color: #2ecc71;
+        }
+
+        .btn-primary:hover {
+            background-color: #2980b9;
+            border-color: #2980b9;
+        }
+    </style>
 </head>
-<body>
+
+<body class="bg-light">
     <div class="container">
-        <h1>Milk Sales</h1>
+        <div class="sales-container">
+            <h3 class="text-center mb-4">Milk Sales</h3>
 
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Sale ID</th>
-                    <th>Sale Type</th>
-                    <th>Animal ID</th>
-                    <th>Sale Date</th>
-                    <th>Quantity (Liters)</th>
-                    <th>Price/Liter</th>
-                    <th>Total Sale Price</th>
-                    <th>Buyer Name</th>
-                    <th>Invoice Number</th>
-                    <th>Payment Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($sales as $sale): ?>
+            <?php if (session()->has('success')): ?>
+                <div class="alert alert-success text-center">
+                    <?= esc(session()->getFlashdata('success')) ?>
+                </div>
+            <?php endif; ?>
+
+            <table class="table table-striped">
+                <thead>
                     <tr>
-                        <td><?= $sale['id'] ?></td>
-                        <td><?= $sale['sale_type'] ?></td>
-                        <td><?= $sale['animal_id'] ?></td>
-                        <td><?= $sale['sale_date'] ?></td>
-                        <td><?= $sale['quantity_liters'] ?></td>
-                        <td><?= $sale['price_per_liter'] ?></td>
-                        <td><?= $sale['sale_price'] ?></td>
-                        <td><?= $sale['buyer_name'] ?></td>
-                        <td><?= $sale['invoice_number'] ?></td>
-                        <td><?= $sale['payment_status'] ?></td>
+                        <th>Sale ID</th>
+                        <th>Sale Type</th>
+                        <th>Animal ID</th>
+                        <th>Sale Date</th>
+                        <th>Quantity (Liters)</th>
+                        <th>Price/Liter</th>
+                        <th>Total Sale Price</th>
+                        <th>Buyer Name</th>
+                        <th>Invoice Number</th>
+                        <th>Payment Status</th>
+                        <th>Actions</th>
                     </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    <?php foreach ($sales as $sale): ?>
+                        <tr>
+                            <td><?= $sale['id'] ?></td>
+                            <td><?= $sale['sale_type'] ?></td>
+                            <td><?= $sale['animal_id'] ?></td>
+                            <td><?= $sale['sale_date'] ?></td>
+                            <td><?= $sale['quantity_liters'] ?></td>
+                            <td><?= $sale['price_per_liter'] ?></td>
+                            <td><?= $sale['sale_price'] ?></td>
+                            <td><?= $sale['buyer_name'] ?></td>
+                            <td><?= $sale['invoice_number'] ?></td>
+                            <td><?= $sale['payment_status'] ?></td>
+                            <td>
+                                <a href="<?= base_url('edit-sale/' . $sale['id']) ?>" class="btn btn-primary btn-sm">Edit</a>
+                                <a href="<?= base_url('delete-sale/' . $sale['id']) ?>" class="btn btn-danger btn-sm">Delete</a>
+                                
+                            </td>
+                            <td>
+    <a href="<?= base_url('download-invoice/' . $sale['id']) ?>" class="btn btn-info btn-sm">Download Invoice</a>
+</td>
 
-        <h2>Add New Milk Sale</h2>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
 
-        <?php if (isset($validation_errors) && !empty($validation_errors)): ?>
-            <div class="alert alert-danger">
-                <?php foreach ($validation_errors as $error): ?>
-                    <p><?= $error ?></p>
-                <?php endforeach; ?>
-            </div>
-        <?php endif; ?>
-
-        <form action="<?= base_url('add_sale') ?>" method="post">
-            <div class="mb-3">
-                <label for="sale_type">Sale Type:</label>
-                <select name="sale_type" id="sale_type" class="form-select">
-                    <option value="wholesale">Wholesale</option>
-                    <option value="retail">Retail</option>
-                </select>
-            </div>
-            <div class="mb-3">
-                <label for="animal_id">Animal ID:</label>
-                <input type="text" name="animal_id" id="animal_id" class="form-control" value="<?= set_value('animal_id') ?>">
-            </div>
-            <div class="mb-3">
-                <label for="sale_date">Sale Date:</label>
-                <input type="date" name="sale_date" id="sale_date" class="form-control" value="<?= set_value('sale_date') ?>">
-            </div>
-            <div class="mb-3">
-                <label for="quantity_liters">Quantity (Liters):</label>
-                <input type="number" step="0.01" name="quantity_liters" id="quantity_liters" class="form-control" value="<?= set_value('quantity_liters') ?>">
-            </div>
-            <div class="mb-3">
-                <label for="price_per_liter">Price per Liter:</label>
-                <input type="number" step="0.01" name="price_per_liter" id="price_per_liter" class="form-control" value="<?= set_value('price_per_liter') ?>">
-            </div>
-            <div class="mb-3">
-                <label for="buyer_name">Buyer Name:</label>
-                <input type="text" name="buyer_name" id="buyer_name" class="form-control" value="<?= set_value('buyer_name') ?>">
-            </div>
-            <div class="mb-3">
-                <label for="invoice_number">Invoice Number:</label>
-                <input type="text" name="invoice_number" id="invoice_number" class="form-control" value="<?= set_value('invoice_number') ?>">
-            </div>
-            <div class="mb-3">
-                <label for="payment_status">Payment Status:</label>
-                <select name="payment_status" id="payment_status" class="form-select">
-                <div class="mb-3">
-    <label for="payment_status">Payment Status:</label>
-    <select name="payment_status" id="payment_status" class="form-select">
-        <option value="pending">Pending</option>
-        <option value="partially_paid">Partially Paid</option>
-        <option value="fully_paid">Fully Paid</option>
-    </select>
-</div>
-<button 1  type="submit" class="btn btn-primary">Add Sale</button>
-</form>
-</div>
+            <h4>Add New Sale</h4>
+            <a href="<?= base_url('add-sale') ?>" class="btn btn-success btn-block">Add Sale</a>
+        </div>
+    </div>
 </body>
+
 </html>
