@@ -10,19 +10,33 @@ class CalfController extends BaseController
 {
     
     public function calves(): string
-{
-    $userModel = new UserModel();
-    $user = $userModel->asObject()
-    ->where('username', session()->get('username'))
-    ->orWhere('email', session()->get('email'))
-    ->first();
-
-    $calfModel = new CalfModel();
-    $calves = $calfModel->findAll();
-
-    return view('layout', data: ['content' => view('pages/calves', ['user' => $user,'calves' => $calves])]);
-}
-
+    {
+        $userModel = new UserModel();
+        $user = $userModel->asObject()
+            ->where('username', session()->get('username'))
+            ->orWhere('email', session()->get('email'))
+            ->first();
+    
+        $calfModel = new CalfModel();
+        $calves = $calfModel->findAll();
+    
+        // Assuming you have a CowModel to fetch cows data
+        $cowModel = new CowModel();
+        $cows = $cowModel->findAll();  // Adjust this if you're fetching cows differently
+    
+        // Load the validation library
+        $validation = \Config\Services::validation();
+    
+        return view('layout', data: [
+            'content' => view('pages/calves', [
+                'user' => $user,
+                'calves' => $calves,
+                'cows' => $cows,  // Add cows to the data array
+                'validation' => $validation  // Pass validation object to the view
+            ])
+        ]);
+    }
+    
 public function addCalf()
 {
     // Validation rules
@@ -65,7 +79,7 @@ public function editCalf($id)
         return redirect()->to('calves')->with('error', 'Calf not found.');
     }
 
-    return view('edit_calf', ['calf' => $calf]);
+    return view('pages/edit_calf', ['calf' => $calf]);
 }
 
 public function updateCalf($id)

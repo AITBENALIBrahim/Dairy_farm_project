@@ -4,142 +4,191 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <title>Add New Calf</title>
-    <link rel="shortcut icon" href="<?= base_url('images/logo.png') ?>" type="image/png" />
+    <title>Calves</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
-            margin-top: 10px;
+            background-color: #f7f7f7;
+            font-family: 'Arial', sans-serif;
         }
-        .calf-container {
-            max-width: 700px;
-            width: 500px;
-            background-color: #ffffff;
-            padding: 2rem;
+
+        .container {
+            max-width: 1100px;
+            margin: auto;
+            padding-top: 30px;
+        }
+
+        h1, h2 {
+            color: #333;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .table {
+            background-color: #fff;
             border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            animation: fadeIn 1s ease-in-out;
-            margin-top: 10px;
-            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
         }
-        .logo-title-container {
+
+        .table th, .table td {
+            vertical-align: middle;
             text-align: center;
+        }
+
+        .table th {
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px;
+        }
+
+        .table td {
+            padding: 10px;
+        }
+
+        .table-striped tbody tr:nth-child(odd) {
+            background-color: #f1f1f1;
+        }
+
+        .btn {
+            transition: all 0.3s ease-in-out;
+        }
+
+        .btn:hover {
+            opacity: 0.85;
+        }
+
+        .form-control, .form-select {
+            border-radius: 8px;
+            padding: 10px;
+            font-size: 1rem;
+            margin-bottom: 20px;
+        }
+
+        .alert-danger {
+            margin-bottom: 20px;
+        }
+
+        .form-container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-container label {
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .mb-3 {
             margin-bottom: 1.5rem;
         }
-        .calf-logo {
-            width: 80px;
-            height: 80px;
-            margin-bottom: 15px;
+
+        .add-calf-button {
+            background-color: #007bff;
+            border-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
         }
-        .calf-container h3 {
-            color: #2c3e50;
-            font-weight: 700;
-            font-size: 1.8rem;
-        }
-        .form-group label {
-            font-weight: 600;
-            color: #2c3e50;
-        }
-        .btn-success {
-            background-color: #27ae60;
-            border-color: #27ae60;
-            font-weight: 600;
-            border-radius: 5px;
-            transition: transform 0.3s;
-        }
-        .btn-success:hover {
-            transform: scale(1.05);
-        }
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
+
+        .add-calf-button:hover {
+            background-color: #0056b3;
+            border-color: #004085;
         }
     </style>
 </head>
 
-<body class="d-flex align-items-center bg-light" style="height: 100vh;">
-    <div class="container d-flex justify-content-center">
-        <div class="calf-container">
-            <div class="logo-title-container">
-                <img src="<?= base_url('images/logo.png') ?>" alt="Logo" class="calf-logo">
-                <h3 class="text-center">Add New Calf</h3>
-            </div>
+<body>
+    <div class="container">
+        <h1>List of Calves</h1>
 
-            <!-- Flash Message for Errors -->
-            <?php if (session()->has('error')): ?>
-                <div class="alert alert-danger text-center">
-                    <?= esc(session()->getFlashdata('error')) ?>
+        <!-- Table with Calves -->
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Tag Number</th>
+                    <th>Date of Birth</th>
+                    <th>Health Status</th>
+                    <th>Mother's Tag Number</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php if (empty($calves)): ?>
+                    <tr>
+                        <td colspan="5" class="text-center">No calves found.</td>
+                    </tr>
+                <?php else: ?>
+                    <?php foreach ($calves as $calf): ?>
+                        <tr>
+                            <td><?= esc($calf['tag_number']) ?></td>
+                            <td><?= esc($calf['date_of_birth']) ?></td>
+                            <td><?= esc($calf['health_status']) ?></td>
+                            <td>
+                                <?php 
+                                    // Assuming you have the cow's tag_number in the database
+                                    $motherCow = array_filter($cows, function($cow) use ($calf) {
+                                        return $cow['id'] == $calf['cow_id'];
+                                    });
+                                    echo esc($motherCow ? reset($motherCow)['tag_number'] : 'Unknown');
+                                ?>
+                            </td>
+                            <td>
+                                <a href="<?= base_url('edit-calf/' . $calf['id']) ?>" class="btn btn-sm btn-primary">Edit</a>
+                                <a href="<?= base_url('delete-calf/' . $calf['id']) ?>" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this calf?')">Delete</a>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </tbody>
+        </table>
+
+        <!-- Add New Calf Section -->
+        <div class="form-container">
+            <h2>Add New Calf</h2>
+            <?php if (isset($validation_errors) && !empty($validation_errors)): ?>
+                <div class="alert alert-danger">
+                    <?php foreach ($validation_errors as $error): ?>
+                        <p><?= $error ?></p>
+                    <?php endforeach; ?>
                 </div>
             <?php endif; ?>
-
-            <!-- Add Calf Form -->
-            <form action="<?= base_url('save-calf') ?>" method="POST">
-                <?= csrf_field() ?>
-
-<!-- Cow ID Field (Mother) -->
-<div class="form-group">
-    <label for="cow_id" class="d-block text-left">Cow ID (Mother)</label>
-    <select name="cow_id" id="cow_id" class="form-control <?= isset($validation) && $validation->hasError('cow_id') ? 'is-invalid' : '' ?>">
-        <option value="">Select a Cow</option>
-        <?php foreach ($cows as $cow): ?>
-            <option value="<?= $cow['id'] ?>" <?= old('cow_id') == $cow['id'] ? 'selected' : '' ?>>
-                <?= esc($cow['tag_number']) ?> <!-- Assuming 'tag_number' identifies cows -->
-            </option>
-        <?php endforeach; ?>
-    </select>
-    <?php if (isset($validation) && $validation->hasError('cow_id')): ?>
-        <div class="invalid-feedback text-left">
-            <?= esc($validation->getError('cow_id')) ?>
-        </div>
-    <?php endif; ?>
-</div>
-
-                <!-- Tag Number Field -->
-                <div class="form-group">
-                    <label for="tag_number" class="d-block text-left">Tag Number</label>
-                    <input autocomplete="off" type="text" name="tag_number" id="tag_number" class="form-control <?= $validation && $validation->hasError('tag_number') ? 'is-invalid' : '' ?>" value="<?= old('tag_number') ?>" placeholder="Enter tag number">
-                    <?php if ($validation && $validation->hasError('tag_number')): ?>
-                        <div class="invalid-feedback text-left">
-                            <?= esc($validation->getError('tag_number')) ?>
-                        </div>
-                    <?php endif; ?>
+            <form action="<?= base_url('save-calf') ?>" method="post">
+                <div class="mb-3">
+                    <label for="cow_id">Cow ID (Mother):</label>
+                    <select name="cow_id" id="cow_id" class="form-select">
+                        <option value="">Select a Cow</option>
+                        <?php foreach ($cows as $cow): ?>
+                            <option value="<?= $cow['id'] ?>" <?= old('cow_id') == $cow['id'] ? 'selected' : '' ?>>
+                                <?= esc($cow['tag_number']) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
                 </div>
 
-                <!-- Date of Birth Field -->
-                <div class="form-group">
-                    <label for="date_of_birth" class="d-block text-left">Date of Birth</label>
-                    <input type="date" name="date_of_birth" id="date_of_birth" class="form-control <?= $validation && $validation->hasError('date_of_birth') ? 'is-invalid' : '' ?>" value="<?= old('date_of_birth') ?>">
-                    <?php if ($validation && $validation->hasError('date_of_birth')): ?>
-                        <div class="invalid-feedback text-left">
-                            <?= esc($validation->getError('date_of_birth')) ?>
-                        </div>
-                    <?php endif; ?>
+                <div class="mb-3">
+                    <label for="tag_number">Tag Number:</label>
+                    <input type="text" name="tag_number" id="tag_number" class="form-control" value="<?= old('tag_number') ?>">
                 </div>
 
-                <!-- Health Status Field -->
-                <div class="form-group">
-                    <label for="health_status" class="d-block text-left">Health Status</label>
-                    <input autocomplete="off" type="text" name="health_status" id="health_status" class="form-control <?= $validation && $validation->hasError('health_status') ? 'is-invalid' : '' ?>" value="<?= old('health_status') ?>" placeholder="Enter health status">
-                    <?php if ($validation && $validation->hasError('health_status')): ?>
-                        <div class="invalid-feedback text-left">
-                            <?= esc($validation->getError('health_status')) ?>
-                        </div>
-                    <?php endif; ?>
+                <div class="mb-3">
+                    <label for="date_of_birth">Date of Birth:</label>
+                    <input type="date" name="date_of_birth" id="date_of_birth" class="form-control" value="<?= old('date_of_birth') ?>">
                 </div>
 
-                <button type="submit" class="btn btn-success btn-block">Save Calf</button>
+                <div class="mb-3">
+                    <label for="health_status">Health Status:</label>
+                    <input type="text" name="health_status" id="health_status" class="form-control" value="<?= old('health_status') ?>">
+                </div>
+
+                <button type="submit" class="btn add-calf-button">Add Calf</button>
             </form>
         </div>
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>

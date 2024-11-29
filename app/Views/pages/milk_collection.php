@@ -10,110 +10,98 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-KyZXEJ9vM9vYd8m5U6tMZgZj5yTc+LhT1kF0kLZPeJwN1gEuK27u27oK9Z8A6v7M" crossorigin="anonymous">
 
-    <!-- Font Awesome Icons -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
-
-    <!-- Custom CSS for styling -->
     <style>
+        body {
+            background-color: #f7f7f7;
+            font-family: 'Arial', sans-serif;
+        }
+
         .container {
-            background-color: #ffffff;
-            padding: 0.5rem 2rem;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            animation: fadeIn 1s ease-in-out;
-            overflow-x: hidden;
-            min-height: 500px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
+            max-width: 1100px;
+            margin: auto;
+            padding-top: 30px;
         }
 
-        h1,
-        h2 {
-            color: #2c3e50;
+        h1, h2 {
+            color: #333;
             font-weight: 700;
-            margin-bottom: 1.5rem;
-            text-align: center;
-        }
-
-        .btn {
-            margin-right: 5px;
+            margin-bottom: 20px;
         }
 
         .table {
-            border: none;
-            table-layout: fixed;
-        }
-
-        .table th,
-        .table td {
-            vertical-align: middle;
-            color: #2c3e50;
-        }
-
-        /* Reduce table row height */
-        .table th,
-        .table td {
-            padding: 0.25rem 0.5rem;
-            /* Adjust the padding to reduce row height */
-            font-size: 0.9rem;
-            /* Optional: reduce font size for better fit */
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
             overflow: hidden;
-            /* Prevent content from overflowing */
-            text-overflow: ellipsis;
         }
 
-        /* Optional: Adjust table header height */
+        .table th, .table td {
+            vertical-align: middle;
+            text-align: center;
+        }
+
         .table th {
-            padding-top: 0.25rem;
-            padding-bottom: 0.25rem;
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px;
         }
 
-        /* Fade-in effect */
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-
-            to {
-                opacity: 1;
-            }
+        .table td {
+            padding: 10px;
         }
 
-        /* Success/Error Message */
-        .alert {
+        .table-striped tbody tr:nth-child(odd) {
+            background-color: #f1f1f1;
+        }
+
+        .btn {
+            transition: all 0.3s ease-in-out;
+        }
+
+        .btn:hover {
+            opacity: 0.85;
+        }
+
+        .form-control, .form-select {
+            border-radius: 8px;
+            padding: 10px;
+            font-size: 1rem;
+            margin-bottom: 20px;
+        }
+
+        .alert-danger {
+            margin-bottom: 20px;
+        }
+
+        .form-container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-container label {
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .mb-3 {
             margin-bottom: 1.5rem;
         }
 
-        .btn-primary {
-            background-color: #3498db;
-            border-color: #3498db;
-        }
-
-        /* Table and Button Colors */
         .btn-success {
             background-color: #27ae60;
             border-color: #27ae60;
-            font-weight: 600;
-            border-radius: 5px;
-            transition: transform 0.3s;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
         }
 
         .btn-success:hover {
-            transform: scale(1.05);
+            background-color: #219150;
+            border-color: #219150;
         }
 
-        .form-control,
-        .form-select {
-            font-size: 0.9rem;
-        }
-
-        /* Center alignment for form elements */
-        .form-container {
-            margin-bottom: 2rem;
-        }
-
-        /* Pagination container */
         .pagination-container {
             display: flex;
             justify-content: space-between;
@@ -123,7 +111,7 @@
     </style>
 </head>
 
-<body class="d-flex align-items-center bg-light" style="height: 100vh;">
+<body>
     <div class="container">
 
         <!-- Success/Error Messages -->
@@ -141,8 +129,8 @@
             <table class="table table-striped">
                 <thead>
                     <tr>
-                        <th style="width: 70px;">ID</th>
-                        <th style="width: 90px;">Cow ID</th>
+                        <th>Collection ID</th>
+                        <th>Cow ID</th>
                         <th>Collection Date</th>
                         <th>Quantity</th>
                         <th>Milk Type</th>
@@ -167,17 +155,18 @@
         <?php endif; ?>
 
         <!-- Form to add a new milk collection -->
-        <h2>Add New Milk Collection</h2>
-        <?php if (validation_errors()) : ?>
-            <div class="alert alert-danger">
-                <?php foreach (validation_errors() as $error) : ?>
-                    <p><?= $error ?></p>
-                <?php endforeach; ?>
-            </div>
-        <?php endif; ?>
+        <div class="form-container">
+            <h2>Add New Milk Collection</h2>
 
-        <form action="<?= base_url('add_milk_collection') ?>" method="post">
-            <div class="form-container">
+            <?php if (validation_errors()) : ?>
+                <div class="alert alert-danger">
+                    <?php foreach (validation_errors() as $error) : ?>
+                        <p><?= $error ?></p>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
+
+            <form action="<?= base_url('add_milk_collection') ?>" method="post">
                 <div class="mb-3">
                     <label for="cow_id">Cow ID:</label>
                     <input type="text" name="cow_id" id="cow_id" class="form-control" value="<?= set_value('cow_id') ?>">
@@ -198,8 +187,8 @@
                     <input type="text" name="employee_id" id="employee_id" class="form-control" value="<?= set_value('employee_id') ?>">
                 </div>
                 <button type="submit" class="btn btn-success">Add Collection</button>
-            </div>
-        </form>
+            </form>
+        </div>
 
     </div>
 
