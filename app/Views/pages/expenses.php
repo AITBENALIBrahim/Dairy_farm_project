@@ -160,24 +160,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($expenses as $expense): ?>
-                        <tr>
-                            <td><?= $expense->id ?></td>
-                            <td><?= $expense->expense_date ?></td>
-                            <td><?= $expense->expense_type ?></td>
-                            <td><?= $expense->amount ?></td>
-                            <td><?= $expense->description ?></td>
-                            <td>
-                                <a href="<?= base_url('edit-expense/' . $expense->id) ?>" class="btn btn-sm btn-info">
-                                    <i class="fas fa-edit"></i> Edit
-                                </a>
-                                <a href="<?= base_url('delete-expense/' . $expense->id) ?>" class="btn btn-sm btn-danger"
-                                    onclick="return confirm('Are you sure you want to delete this expense?');">
-                                    <i class="fas fa-trash"></i> Delete
-                                </a>
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
+                    
                 </tbody>
             </table>
         <?php else: ?>
@@ -304,9 +287,10 @@
 
             filteredExpenses = expenses.filter(expense => {
                 return (
-                    expense.username.toLowerCase().includes(searchTerm) ||
-                    expense.email.toLowerCase().includes(searchTerm) ||
-                    expense.role.toLowerCase().includes(searchTerm)
+                    expense.expense_date.toLowerCase().includes(searchTerm) ||
+                    expense.expense_type.toLowerCase().includes(searchTerm) ||
+                    expense.amount.toString().includes(searchTerm) ||
+                    expense.description.toLowerCase().includes(searchTerm)
                 );
             });
 

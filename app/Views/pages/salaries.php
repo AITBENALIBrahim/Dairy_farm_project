@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Suppliers - Dairy Farm</title>
+    <title>Salaries - Dairy Farm</title>
 
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -50,26 +50,14 @@
             color: #2c3e50;
         }
 
-        /* Reduce table row height */
         .table th,
         .table td {
             padding: 0.25rem 0.5rem;
-            /* Adjust the padding to reduce row height */
             font-size: 0.9rem;
-            /* Optional: reduce font size for better fit */
             overflow: hidden;
-            /* Prevent content from overflowing */
             text-overflow: ellipsis;
         }
 
-        /* Optional: Adjust table header height */
-        .table th {
-            padding-top: 0.25rem;
-            padding-bottom: 0.25rem;
-        }
-
-
-        /* Fade-in effect */
         @keyframes fadeIn {
             from {
                 opacity: 0;
@@ -80,12 +68,10 @@
             }
         }
 
-        /* Success/Error Message */
         .alert {
             margin-bottom: 1.5rem;
         }
 
-        /* Table and Button Colors */
         .btn-info {
             background-color: #3498db;
             border-color: #3498db;
@@ -108,17 +94,6 @@
             transform: scale(1.05);
         }
 
-        /* Image Thumbnail for Photo */
-        .user-photo {
-            width: 40px;
-            height: 40px;
-            object-fit: cover;
-            border-radius: 50%;
-            padding: 2px;
-            border: 1px solid #fff;
-        }
-
-        /* Center alignment for "No assistants added" */
         .text {
             font-weight: 600;
             color: #2c3e50;
@@ -127,7 +102,6 @@
             justify-content: space-between;
         }
 
-        /* Pagination container */
         .pagination-container {
             display: flex;
             justify-content: space-between;
@@ -135,19 +109,14 @@
             margin-top: auto;
         }
 
-        /* Style for the search icon inside the search bar */
         .search-icon {
             position: absolute;
             right: 10px;
-            /* Adjust this value to control horizontal alignment */
             top: 50%;
             transform: translateY(-50%);
             color: #aaa;
-            /* Light gray color for the icon */
             pointer-events: none;
-            /* Make sure the icon does not intercept clicks */
             font-size: 1rem;
-            /* Adjust the icon size if needed */
         }
     </style>
 </head>
@@ -155,16 +124,16 @@
 <body class="d-flex align-items-center bg-light" style="height: 100vh;">
     <div class="container">
 
-        <!-- Button to add a new supplier and the search bar -->
+        <!-- Button to add a new salary and the search bar -->
         <div class="d-flex justify-content-between align-items-center">
             <div class="position-relative" style="max-width: 300px;">
-                <input type="text" id="search-bar" class="form-control pr-4" placeholder="Search suppliers..." oninput="searchSuppliers()">
+                <input type="text" id="search-bar" class="form-control pr-4" placeholder="Search salaries..." oninput="searchsalaries()">
                 <i class="fas fa-search search-icon"></i>
             </div>
 
             <div class="text">
-                <a href="<?= base_url('add-supplier') ?>" class="btn btn-success mt-3">
-                    <i class="fas fa-plus"></i> Add New Supplier
+                <a href="<?= base_url('add-salary') ?>" class="btn btn-success mt-3">
+                    <i class="fas fa-plus"></i> Add New salary
                 </a>
             </div>
         </div>
@@ -177,25 +146,26 @@
             <div class="alert alert-danger text-center"><?= session()->getFlashdata('error') ?></div>
         <?php endif; ?>
 
-        <!-- Table for displaying suppliers -->
-        <?php if ($suppliers): ?>
+        <!-- Table for displaying salaries -->
+        <?php if ($salaries): ?>
             <table class="table table-striped">
                 <thead>
                     <tr>
                         <th style="width: 70px;">ID</th>
-                        <th>Name</th>
-                        <th>Contact Number</th>
-                        <th>Address</th>
-                        <th>Supplied Items</th>
+                        <th>Employee Name (ID)</th>
+                        <th>Amount Paid</th>
+                        <th>Payment date</th>
+                        <th>Payment method</th>
+                        <th>Note</th>
                         <th style="width: 200px;">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    
+
                 </tbody>
             </table>
         <?php else: ?>
-            <h3 class="text-center">No suppliers added</h3>
+            <h3 class="text-center">No salaries recorded</h3>
         <?php endif; ?>
 
         <!-- Pagination Controls -->
@@ -206,43 +176,44 @@
     </div>
 
     <!-- Bootstrap JS, Popper.js -->
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz4fnFO9gybT1j3sA5b7Kydn9beDcih0z8zkP8fGGp1p4v9rfOnqv7t8d47" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz4fnFO9gybT1j3a5b7Kydn9beDcih0z8zkP8fGGp1p4v9rfOnqv7t8d47" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js" integrity="sha384-pzjw8f+ua7Kw1TIq0M8Fq1hnwz8d8Ck93k0xt0Q4LmZOL2BxDd6DTRt+ro+/pz8D" crossorigin="anonymous"></script>
 
     <script>
-        // Sample data (replace with your actual supplier data array)
-        let suppliers = <?= json_encode($suppliers) ?>;
+        // Sample data (replace with your actual salary data array)
+        let salaries = <?= json_encode($salaries) ?>;
         let itemsPerPage = 5; // Default items per page
         let currentPage = 1; // Track the current page
-        let filteredSuppliers = suppliers; // Variable to hold filtered data for search
+        let filteredSalaries = salaries; // Variable to hold filtered data for search
 
         // Function to render the table with paginated data
         function renderTable(page) {
             const start = (page - 1) * itemsPerPage;
             const end = start + itemsPerPage;
-            const paginatedData = filteredSuppliers.slice(start, end);
+            const paginatedData = filteredSalaries.slice(start, end);
             const tableBody = document.querySelector('table tbody');
             tableBody.innerHTML = ''; // Clear previous table rows
 
             // Add rows for the current page
-            paginatedData.forEach(supplier => {
+            paginatedData.forEach(salary => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${supplier.id}</td>
-                    <td>${supplier.name}</td>
-                    <td>${supplier.contact_number}</td>
-                    <td>${supplier.address}</td>
-                    <td>${supplier.supplied_items}</td>
+                    <td>${salary.id}</td>
+                    <td>${salary.employee_name} (${salary.employee_id})</td>
+                    <td>${salary.amount_paid}</td>
+                    <td>${salary.payment_date}</td>
+                    <td>${salary.payment_method}</td>
+                    <td>${salary.note}</td>
                     <td>
-                        <a href="/edit-supplier/${supplier.id}" class="btn btn-sm btn-info"><i class="fas fa-edit"></i> Edit</a>
-                        <a href="/delete-supplier/${supplier.id}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this supplier?');"><i class="fas fa-trash"></i> Delete</a>
+                        <a href="/edit-salary/${salary.id}" class="btn btn-sm btn-info"><i class="fas fa-edit"></i> Edit</a>
+                        <a href="/delete-salary/${salary.id}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this salary?');"><i class="fas fa-trash"></i> Delete</a>
                     </td>
                 `;
                 tableBody.appendChild(row);
             });
 
             // Update pagination count
-            document.getElementById('pagination-count').textContent = `Page ${page} of ${Math.ceil(filteredSuppliers.length / itemsPerPage)}`;
+            document.getElementById('pagination-count').textContent = `Page ${page} of ${Math.ceil(filteredSalaries.length / itemsPerPage)}`;
 
             // Update pagination buttons
             updatePaginationButtons(page);
@@ -250,7 +221,7 @@
 
         function createPagination() {
             const pagination = document.getElementById('pagination');
-            const totalPages = Math.ceil(filteredSuppliers.length / itemsPerPage);
+            const totalPages = Math.ceil(filteredSalaries.length / itemsPerPage);
 
             // Clear previous pagination buttons
             pagination.innerHTML = '';
@@ -282,7 +253,7 @@
 
         function updatePaginationButtons(page) {
             const pagination = document.getElementById('pagination');
-            const totalPages = Math.ceil(filteredSuppliers.length / itemsPerPage);
+            const totalPages = Math.ceil(filteredSalaries.length / itemsPerPage);
 
             // Disable Previous button on first page
             pagination.children[0].classList.toggle('disabled', page === 1);
@@ -302,7 +273,7 @@
 
         // Change page and render new data
         function changePage(page) {
-            const totalPages = Math.ceil(filteredSuppliers.length / itemsPerPage);
+            const totalPages = Math.ceil(filteredSalaries.length / itemsPerPage);
 
             // Ensure page stays within bounds
             if (page < 1) page = 1;
@@ -312,16 +283,17 @@
             renderTable(page);
         }
 
-        // Search suppliers based on input
-        function searchSuppliers() {
+        // Search salaries based on input
+        function searchsalaries() {
             const searchTerm = document.getElementById('search-bar').value.toLowerCase();
 
-            filteredSuppliers = suppliers.filter(supplier => {
+            filteredSalaries = salaries.filter(salary => {
                 return (
-                    supplier.name.toLowerCase().includes(searchTerm) ||
-                    supplier.address.toLowerCase().includes(searchTerm) ||
-                    supplier.contact_number.toLowerCase().includes(searchTerm) ||
-                    supplier.supplied_items.toLowerCase().includes(searchTerm)
+                    salary.employee_name.toLowerCase().includes(searchTerm) ||
+                    salary.amount_paid.toLowerCase().includes(searchTerm) ||
+                    salary.payment_date.toLowerCase().includes(searchTerm) ||
+                    salary.payment_method.toLowerCase().includes(searchTerm) ||
+                    salary.note.toLowerCase().includes(searchTerm)
                 );
             });
 

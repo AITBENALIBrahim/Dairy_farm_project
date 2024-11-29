@@ -108,7 +108,12 @@
                 <!-- Expense Type Field -->
                 <div class="form-group">
                     <label for="expense_type" class="d-block text-left">Expense Type</label>
-                    <input type="text" name="expense_type" id="expense_type" class="form-control <?= session('validation') && session('validation')->hasError('expense_type') ? 'is-invalid' : '' ?>" value="<?= old('expense_type', $expense['expense_type']) ?>" placeholder="Enter expense type">
+                    <div class="input-group <?= $validation && $validation->hasError('expense_type') ? 'is-invalid' : '' ?>">
+                        <div class="input-group-prepend">
+                            <span class="fas fa-dollar-sign"></span>
+                        </div>
+                        <input type="text" name="expense_type" id="expense_type" class="form-control <?= session('validation') && session('validation')->hasError('expense_type') ? 'is-invalid' : '' ?>" value="<?= old('expense_type', $expense['expense_type']) ?>" placeholder="Enter expense type">
+                    </div>
                     <?php if (session('validation') && session('validation')->hasError('expense_type')): ?>
                         <div class="invalid-feedback text-left">
                             <?= esc(session('validation')->getError('expense_type')) ?>
@@ -119,7 +124,12 @@
                 <!-- Expense Date Field -->
                 <div class="form-group">
                     <label for="expense_date" class="d-block text-left">Expense Date</label>
-                    <input type="date" name="expense_date" id="expense_date" class="form-control <?= session('validation') && session('validation')->hasError('expense_date') ? 'is-invalid' : '' ?>" value="<?= old('expense_date', $expense['expense_date']) ?>">
+                    <div class="input-group <?= $validation && $validation->hasError('expense_date') ? 'is-invalid' : '' ?>">
+                        <div class="input-group-prepend">
+                            <span class="fas fa-calendar-alt"></span>
+                        </div>
+                        <input type="date" name="expense_date" id="expense_date" class="form-control <?= session('validation') && session('validation')->hasError('expense_date') ? 'is-invalid' : '' ?>" value="<?= old('expense_date', $expense['expense_date']) ?>">
+                    </div>
                     <?php if (session('validation') && session('validation')->hasError('expense_date')): ?>
                         <div class="invalid-feedback text-left">
                             <?= esc(session('validation')->getError('expense_date')) ?>
@@ -130,7 +140,12 @@
                 <!-- Amount Field -->
                 <div class="form-group">
                     <label for="amount" class="d-block text-left">Amount</label>
-                    <input type="number" name="amount" id="amount" class="form-control <?= session('validation') && session('validation')->hasError('amount') ? 'is-invalid' : '' ?>" value="<?= old('amount', $expense['amount']) ?>" placeholder="Enter amount" step="0.01">
+                    <div class="input-group <?= $validation && $validation->hasError('amount') ? 'is-invalid' : '' ?>">
+                        <div class="input-group-prepend">
+                            <span class="fas fa-money-bill-wave"></span>
+                        </div>
+                        <input type="number" name="amount" id="amount" class="form-control <?= session('validation') && session('validation')->hasError('amount') ? 'is-invalid' : '' ?>" value="<?= old('amount', $expense['amount']) ?>" placeholder="Enter amount" step="0.01">
+                    </div>
                     <?php if (session('validation') && session('validation')->hasError('amount')): ?>
                         <div class="invalid-feedback text-left">
                             <?= esc(session('validation')->getError('amount')) ?>
@@ -141,7 +156,12 @@
                 <!-- Description Field -->
                 <div class="form-group">
                     <label for="description" class="d-block text-left">Description</label>
-                    <textarea name="description" id="description" class="form-control <?= session('validation') && session('validation')->hasError('description') ? 'is-invalid' : '' ?>" placeholder="Enter description"><?= old('description', $expense['description']) ?></textarea>
+                    <div class="input-group <?= $validation && $validation->hasError('description') ? 'is-invalid' : '' ?>">
+                        <div class="input-group-prepend">
+                            <span class="fas fa-comment"></span>
+                        </div>
+                        <textarea name="description" id="description" class="form-control <?= session('validation') && session('validation')->hasError('description') ? 'is-invalid' : '' ?>" placeholder="Enter description"><?= old('description', $expense['description']) ?></textarea>
+                    </div>
                     <?php if (session('validation') && session('validation')->hasError('description')): ?>
                         <div class="invalid-feedback text-left">
                             <?= esc(session('validation')->getError('description')) ?>
