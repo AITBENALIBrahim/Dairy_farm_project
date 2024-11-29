@@ -12,6 +12,7 @@
         body {
             margin-top: 10px;
         }
+
         .calf-container {
             max-width: 700px;
             width: 500px;
@@ -23,24 +24,43 @@
             margin-top: 10px;
             margin-bottom: 30px;
         }
+
         .logo-title-container {
             text-align: center;
             margin-bottom: 1.5rem;
         }
+
         .calf-logo {
             width: 80px;
             height: 80px;
             margin-bottom: 15px;
         }
+
         .calf-container h3 {
             color: #2c3e50;
             font-weight: 700;
             font-size: 1.8rem;
         }
+
         .form-group label {
             font-weight: 600;
             color: #2c3e50;
         }
+
+        .input-group .form-control {
+            padding-left: 40px;
+        }
+
+        .input-group .input-group-prepend {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.2rem;
+            color: #27ae60;
+            z-index: 10;
+        }
+
         .btn-success {
             background-color: #27ae60;
             border-color: #27ae60;
@@ -48,9 +68,15 @@
             border-radius: 5px;
             transition: transform 0.3s;
         }
+
         .btn-success:hover {
             transform: scale(1.05);
         }
+
+        .invalid-feedback {
+            display: block;
+        }
+
         @keyframes fadeIn {
             from {
                 opacity: 0;
@@ -81,29 +107,34 @@
             <form action="<?= base_url('save-calf') ?>" method="POST">
                 <?= csrf_field() ?>
 
-<!-- Cow ID Field (Mother) -->
-<div class="form-group">
-    <label for="cow_id" class="d-block text-left">Cow ID (Mother)</label>
-    <select name="cow_id" id="cow_id" class="form-control <?= isset($validation) && $validation->hasError('cow_id') ? 'is-invalid' : '' ?>">
-        <option value="">Select a Cow</option>
-        <?php foreach ($cows as $cow): ?>
-            <option value="<?= $cow['id'] ?>" <?= old('cow_id') == $cow['id'] ? 'selected' : '' ?>>
-                <?= esc($cow['tag_number']) ?> <!-- Assuming 'tag_number' identifies cows -->
-            </option>
-        <?php endforeach; ?>
-    </select>
-    <?php if (isset($validation) && $validation->hasError('cow_id')): ?>
-        <div class="invalid-feedback text-left">
-            <?= esc($validation->getError('cow_id')) ?>
-        </div>
-    <?php endif; ?>
-</div>
+                <!-- Cow ID Field -->
+                <div class="form-group">
+                    <label for="cow_id" class="d-block text-left">Cow ID (Mother)</label>
+                    <select name="cow_id" id="cow_id" class="form-control <?= isset($validation) && $validation->hasError('cow_id') ? 'is-invalid' : '' ?>">
+                        <option value="">Select a Cow</option>
+                        <?php foreach ($cows as $cow): ?>
+                            <option value="<?= $cow['id'] ?>" <?= old('cow_id') == $cow['id'] ? 'selected' : '' ?>>
+                                <?= esc($cow['tag_number']) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                    <?php if (isset($validation) && $validation->hasError('cow_id')): ?>
+                        <div class="invalid-feedback text-left">
+                            <?= esc($validation->getError('cow_id')) ?>
+                        </div>
+                    <?php endif; ?>
+                </div>
 
                 <!-- Tag Number Field -->
                 <div class="form-group">
                     <label for="tag_number" class="d-block text-left">Tag Number</label>
-                    <input autocomplete="off" type="text" name="tag_number" id="tag_number" class="form-control <?= $validation && $validation->hasError('tag_number') ? 'is-invalid' : '' ?>" value="<?= old('tag_number') ?>" placeholder="Enter tag number">
-                    <?php if ($validation && $validation->hasError('tag_number')): ?>
+                    <div class="input-group <?= isset($validation) && $validation->hasError('tag_number') ? 'is-invalid' : '' ?>">
+                        <div class="input-group-prepend">
+                            <span class="fas fa-id-badge"></span>
+                        </div>
+                        <input autocomplete="off" type="text" name="tag_number" id="tag_number" class="form-control <?= isset($validation) && $validation->hasError('tag_number') ? 'is-invalid' : '' ?>" value="<?= old('tag_number') ?>" placeholder="Enter tag number">
+                    </div>
+                    <?php if (isset($validation) && $validation->hasError('tag_number')): ?>
                         <div class="invalid-feedback text-left">
                             <?= esc($validation->getError('tag_number')) ?>
                         </div>
@@ -113,8 +144,8 @@
                 <!-- Date of Birth Field -->
                 <div class="form-group">
                     <label for="date_of_birth" class="d-block text-left">Date of Birth</label>
-                    <input type="date" name="date_of_birth" id="date_of_birth" class="form-control <?= $validation && $validation->hasError('date_of_birth') ? 'is-invalid' : '' ?>" value="<?= old('date_of_birth') ?>">
-                    <?php if ($validation && $validation->hasError('date_of_birth')): ?>
+                    <input type="date" name="date_of_birth" id="date_of_birth" class="form-control <?= isset($validation) && $validation->hasError('date_of_birth') ? 'is-invalid' : '' ?>" value="<?= old('date_of_birth') ?>" />
+                    <?php if (isset($validation) && $validation->hasError('date_of_birth')): ?>
                         <div class="invalid-feedback text-left">
                             <?= esc($validation->getError('date_of_birth')) ?>
                         </div>
@@ -124,8 +155,13 @@
                 <!-- Health Status Field -->
                 <div class="form-group">
                     <label for="health_status" class="d-block text-left">Health Status</label>
-                    <input autocomplete="off" type="text" name="health_status" id="health_status" class="form-control <?= $validation && $validation->hasError('health_status') ? 'is-invalid' : '' ?>" value="<?= old('health_status') ?>" placeholder="Enter health status">
-                    <?php if ($validation && $validation->hasError('health_status')): ?>
+                    <div class="input-group <?= isset($validation) && $validation->hasError('health_status') ? 'is-invalid' : '' ?>">
+                        <div class="input-group-prepend">
+                            <span class="fas fa-heartbeat"></span>
+                        </div>
+                        <input autocomplete="off" type="text" name="health_status" id="health_status" class="form-control <?= isset($validation) && $validation->hasError('health_status') ? 'is-invalid' : '' ?>" value="<?= old('health_status') ?>" placeholder="Enter health status">
+                    </div>
+                    <?php if (isset($validation) && $validation->hasError('health_status')): ?>
                         <div class="invalid-feedback text-left">
                             <?= esc($validation->getError('health_status')) ?>
                         </div>

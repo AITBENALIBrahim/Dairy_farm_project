@@ -23,6 +23,7 @@ $routes->match(['GET', 'POST'], '/auth/login', 'Auth::login');
 
 $routes->post('add_milk_collection', 'MilkCollectionController::addMilkCollection');
 $routes->post('add_cow', 'CowController::addCow');
+$routes->get('add_cow', 'CowController::addCow');
 $routes->get('milk-collection', 'MilkCollectionController::index');
 $routes->get('cow', 'CowController::cows');
 $routes->get('calves', 'CalfController::calves');

@@ -20,7 +20,7 @@ class CalfController extends BaseController
     $calfModel = new CalfModel();
     $calves = $calfModel->findAll();
 
-    return view('layout', ['content' => view('pages/calves', ['user' => $user,'calves' => $calves])]);
+    return view('layout', data: ['content' => view('pages/calves', ['user' => $user,'calves' => $calves])]);
 }
 
 public function addCalf()
@@ -55,4 +55,61 @@ public function addCalf()
 
     return redirect()->to('/calves')->with('success', 'Calf added successfully.');
 }
+
+public function editCalf($id)
+{
+    $calfModel = new CalfModel();
+    $calf = $calfModel->find($id);
+
+    if (!$calf) {
+        return redirect()->to('calves')->with('error', 'Calf not found.');
+    }
+
+    return view('edit_calf', ['calf' => $calf]);
+}
+
+public function updateCalf($id)
+{
+    $rules = [
+        'cow_id' => 'required|integer',
+        'tag_number' => 'required',
+        'date_of_birth' => 'required|valid_date',
+        'health_status' => 'required',
+        'stall_id' => 'required',
+        'sale_status' => 'required'
+    ];
+
+    if (!$this->validate($rules)) {
+        $calfModel = new CalfModel();
+        $calf = $calfModel->find($id);
+
+        return view('edit_calf', [
+            'calf' => $calf,
+            'validation_errors' => $this->validator->getErrors()
+        ]);
+    }
+
+    $data = [
+        'cow_id' => $this->request->getPost('cow_id'),
+        'tag_number' => $this->request->getPost('tag_number'),
+        'date_of_birth' => $this->request->getPost('date_of_birth'),
+        'health_status' => $this->request->getPost('health_status'),
+        'stall_id' => $this->request->getPost('stall_id'),
+        'sale_status' => $this->request->getPost('sale_status')
+    ];
+
+    $calfModel = new CalfModel();
+    $calfModel->update($id, $data);
+
+    return redirect()->to('calves')->with('success', 'Calf updated successfully.');
+}
+
+public function deleteCalf($id)
+{
+    $calfModel = new CalfModel();
+    $calfModel->delete($id);
+
+    return redirect()->to('calves')->with('success', 'Calf deleted successfully.');
+}
+
 }
