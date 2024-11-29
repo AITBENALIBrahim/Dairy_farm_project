@@ -20,9 +20,32 @@ $routes->get('/', 'Home::index'); // Home page
 // Authentication routes
 $routes->match(['GET', 'POST'], '/auth/login', 'Auth::login');
 
+$routes->get('/feed-chart', 'FeedChartController::feedChart');
+$routes->get('add-feed', 'FeedChartController::addFeed');
+$routes->post('add-feed', 'FeedChartController::addFeed');
+
+$routes->get('animal-routines', 'AnimalRoutineController::index');
+$routes->post('add-routine', 'AnimalRoutineController::addRoutine');
+$routes->get('add-routine', 'AnimalRoutineController::addRoutine');
+$routes->post('save-routine', 'AnimalRoutineController::saveRoutine');
+// app/Config/Routes.php
+
+$routes->get('delete-routine/(:num)', 'AnimalRoutineController::deleteRoutine/$1');
+// app/Config/Routes.php
+$routes->get('edit-routine/(:num)', 'AnimalRoutineController::editRoutine/$1');
+$routes->post('update-routine/(:num)', 'AnimalRoutineController::updateRoutine/$1');
+
+
+
 
 $routes->post('add_milk_collection', 'MilkCollectionController::addMilkCollection');
 $routes->post('add_cow', 'CowController::addCow');
+$routes->post('save-cow', 'CowController::addCow');
+$routes->post('save-calf', 'CalfController::addCalf');
+$routes->get('add_cow', 'CowController::addCow');
+$routes->get('delete_cow/(:num)', 'CowController::deleteCow/$1');
+$routes->get('download-invoice/(:num)', 'MilkSalesController::download_invoice/$1');
+
 $routes->get('milk-collection', 'MilkCollectionController::index');
 $routes->get('cow', 'CowController::cows');
 $routes->get('calves', 'CalfController::calves');
@@ -34,13 +57,20 @@ $routes->post('add_pregnancy', 'PregnancyRecordsController::addPregnancy');
 $routes->post('add_vaccination', 'VaccinationsController::addVaccination');
 
 $routes->post('add_calf', 'CalfController::addCalf');
+$routes->get('add_calf', 'CalfController::addCalf');
 $routes->post('add_stall', 'StallController::addStall');
 
 
 $routes->post('add_milk_collection', 'MilkSalesController::addMilkCollection');
-$routes->post('add_sale', 'MilkSalesController::addSale');
-$routes->get('add_sale', 'MilkSalesController::addSale');
+$routes->post('add-sale', 'MilkSalesController::addSale');
+$routes->get('add-sale', 'MilkSalesController::addSale');
 $routes->get('milk-sales', 'MilkSalesController::index');
+
+$routes->get('delete-sale/(:num)', 'MilkSalesController::deleteSale/$1');
+// app/Config/Routes.php
+$routes->get('edit-sale/(:num)', 'MilkSalesController::editSale/$1');
+$routes->post('update-sale/(:num)', 'MilkSalesController::updateSale/$1');
+
 
 $routes->post('add_milk_collection', 'MilkSalesController::addMilkCollection');
 $routes->get('milk-sales', 'MilkSalesController::index');
