@@ -123,33 +123,40 @@ class MilkSalesController extends BaseController
     }
 
     public function download_invoice($sale_id) {
+        // Fetch sale data from the database
         $sale = $this->salesModel->find($sale_id);
-
+    
         if (!$sale) {
             throw new \CodeIgniter\Exceptions\PageNotFoundException('Sale not found.');
         }
-
-        // Create HTML content
+    
+        // Create HTML content with all relevant fields
         $html = "<h1>Invoice</h1>";
-        $html .= "<p>Sale ID: " . $sale['id'] . "</p>";
-        $html .= "<p>Customer: " . $sale['buyer_name'] . "</p>";
-        $html .= "<p>Amount: " . $sale['sale_price'] . "</p>";
-
+        $html .= "<p><strong>Invoice Number:</strong> " . $sale['invoice_number'] . "</p>";
+        $html .= "<p><strong>Sale Type:</strong> " . $sale['sale_type'] . "</p>";
+        $html .= "<p><strong>Animal ID:</strong> " . $sale['animal_id'] . "</p>";
+        $html .= "<p><strong>Sale Date:</strong> " . date('Y-m-d', strtotime($sale['sale_date'])) . "</p>";
+        $html .= "<p><strong>Quantity (liters):</strong> " . $sale['quantity_liters'] . "</p>";
+        $html .= "<p><strong>Price per Liter:</strong> " . $sale['price_per_liter'] . "</p>";
+        $html .= "<p><strong>Total Sale Price:</strong> " . $sale['sale_price'] . "</p>";
+        $html .= "<p><strong>Customer Name:</strong> " . $sale['buyer_name'] . "</p>";
+        $html .= "<p><strong>Payment Status:</strong> " . $sale['payment_status'] . "</p>";
+    
         // Initialize DOMPDF
         $options = new Options();
         $options->set('isHtml5ParserEnabled', true);
         $options->set('isPhpEnabled', true);
-
+    
         $dompdf = new Dompdf($options);
         $dompdf->loadHtml($html);
-
+    
         // (Optional) Set paper size and orientation
         $dompdf->setPaper('A4', 'portrait');
-
+    
         // Render PDF (first pass)
         $dompdf->render();
-
+    
         // Output the generated PDF (force download)
         $dompdf->stream('invoice_' . $sale_id . '.pdf', array("Attachment" => 1));
     }
-        }
+            }
