@@ -28,6 +28,7 @@ $routes->get('animal-routines', 'AnimalRoutineController::index');
 $routes->post('add-routine', 'AnimalRoutineController::addRoutine');
 $routes->get('add-routine', 'AnimalRoutineController::addRoutine');
 $routes->post('save-routine', 'AnimalRoutineController::saveRoutine');
+$routes->post('save-cow', 'CowController::saveCow');
 // app/Config/Routes.php
 
 $routes->get('delete-routine/(:num)', 'AnimalRoutineController::deleteRoutine/$1');
