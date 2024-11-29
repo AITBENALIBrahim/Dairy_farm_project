@@ -12,7 +12,7 @@ class SupplierModel extends Model
     protected $allowedFields = ['name', 'contact_number', 'address', 'supplied_items', 'created_by', 'created_at', 'updated_at'];
 
     // Automatically manage timestamps
-    protected $useTimestamps = true;
+    protected $useTimestamps = false;
     protected $createdField  = 'created_at';
     protected $updatedField  = 'updated_at';
 }
