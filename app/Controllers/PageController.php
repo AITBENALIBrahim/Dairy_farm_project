@@ -257,6 +257,12 @@ class PageController extends BaseController
             return $redirect;
         }
 
+        // Check if the user is an admin
+        $redirect = $this->checkAdmin();
+        if ($redirect) {
+            return $redirect;
+        }
+
         // Get the current user from session
         $userModel = new \App\Models\UserModel();
         $assistantModel = new \App\Models\AssistantModel();
@@ -401,6 +407,12 @@ class PageController extends BaseController
     {
         // Check if the user is logged in
         $redirect = $this->checkLogin();
+        if ($redirect) {
+            return $redirect;
+        }
+
+        // Check if the user is an admin
+        $redirect = $this->checkAdmin();
         if ($redirect) {
             return $redirect;
         }
@@ -553,6 +565,12 @@ class PageController extends BaseController
             return $redirect;
         }
 
+        // Check if the user is an admin
+        $redirect = $this->checkAdmin();
+        if ($redirect) {
+            return $redirect;
+        }
+
         // Get the current user from session
         $userModel = new \App\Models\UserModel();
         $assistantModel = new \App\Models\AssistantModel();
@@ -698,6 +716,12 @@ class PageController extends BaseController
     {
         // Check if the user is logged in
         $redirect = $this->checkLogin();
+        if ($redirect) {
+            return $redirect;
+        }
+
+        // Check if the user is an admin
+        $redirect = $this->checkAdmin();
         if ($redirect) {
             return $redirect;
         }

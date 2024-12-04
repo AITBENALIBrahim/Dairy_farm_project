@@ -342,13 +342,15 @@
                 <a href="<?= base_url('/dashboard') ?>" class="<?= isActive('/dashboard') ?>"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a>
 
                 <!-- Employee Management with arrow control -->
-                <div class="nav-item">
-                    <a class="menu-head"><i class="fas fa-users"></i> <span>Employee</span><i class="fas fa-chevron-down toggle-icon"></i></a>
-                    <div class="menu-items">
-                        <a href="<?= base_url('/employees') ?>" class="<?= isActive('/employees') ?>"><span>Employee list</span></a>
-                        <a href="<?= base_url('/salaries') ?>" class="<?= isActive('/salaries') ?>"><span>Employee salaries</span></a>
+                <?php if ($user->role !== 'assistant'): ?>
+                    <div class="nav-item">
+                        <a class="menu-head"><i class="fas fa-users"></i> <span>Employee</span><i class="fas fa-chevron-down toggle-icon"></i></a>
+                        <div class="menu-items">
+                            <a href="<?= base_url('/employees') ?>" class="<?= isActive('/employees') ?>"><span>Employee list</span></a>
+                            <a href="<?= base_url('/salaries') ?>" class="<?= isActive('/salaries') ?>"><span>Employee salaries</span></a>
+                        </div>
                     </div>
-                </div>
+                <?php endif; ?>
 
                 <!-- Milk Management with arrow control -->
                 <div class="nav-item">
@@ -380,9 +382,11 @@
 
                 <!-- Additional Links -->
                 <a href="<?= base_url('/feed-chart') ?>" class="<?= isActive('/feed-chart') ?>"><i class="fas fa-chart-pie"></i> <span>Feed Chart</span></a>
-                <a href="<?= base_url('/sales') ?>" class="<?= isActive('/sales') ?>"><i class="fas fa-shopping-cart"></i> <span>Sales</span></a>
-                <a href="<?= base_url('/expenses') ?>" class="<?= isActive('/expenses') ?>"><i class="fas fa-file-invoice-dollar"></i> <span>Expenses</span></a>
-                <a href="<?= base_url('/suppliers') ?>" class="<?= isActive('/suppliers') ?>"><i class="fas fa-truck"></i> <span>Suppliers</span></a>
+                <?php if ($user->role !== 'assistant'): ?>
+                    <a href="<?= base_url('/sales') ?>" class="<?= isActive('/sales') ?>"><i class="fas fa-shopping-cart"></i> <span>Sales</span></a>
+                    <a href="<?= base_url('/expenses') ?>" class="<?= isActive('/expenses') ?>"><i class="fas fa-file-invoice-dollar"></i> <span>Expenses</span></a>
+                    <a href="<?= base_url('/suppliers') ?>" class="<?= isActive('/suppliers') ?>"><i class="fas fa-truck"></i> <span>Suppliers</span></a>
+                <?php endif; ?>
                 <a href="<?= base_url('/animal-routines') ?>" class="<?= isActive('/animal-routines') ?>"><i class="fas fa-sync-alt"></i> <span>Animal Routines</span></a>
 
                 <!-- Assistants Link -->
