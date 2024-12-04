@@ -129,7 +129,7 @@
             <table class="table table-striped">
                 <thead>
                     <tr>
-                        <th>Collection ID</th>
+                        
                         <th>Cow ID</th>
                         <th>Collection Date</th>
                         <th>Quantity</th>
@@ -140,7 +140,6 @@
                 <tbody>
                     <?php foreach ($milk_collections as $collection): ?>
                         <tr>
-                            <td><?= $collection['id'] ?></td>
                             <td><?= $collection['cow_id'] ?></td>
                             <td><?= $collection['collection_date'] ?></td>
                             <td><?= $collection['quantity'] ?></td>
